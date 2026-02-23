@@ -22,7 +22,6 @@ return new class extends Migration
             $table->date('date_submitted_divhead')->nullable();
             $table->date('date_approved_pe')->nullable();
             $table->date('date_submitted_lce')->nullable();
-            $table->date('date_approved_pe')->nullable();
             $table->foreignUuid('user_id');
             $table->timestamps();
         });
