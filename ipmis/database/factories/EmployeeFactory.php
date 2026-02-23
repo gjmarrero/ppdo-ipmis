@@ -20,7 +20,7 @@ class EmployeeFactory extends Factory
         return [
             'last_name' => fake()->lastName(),
             'first_name' => fake()->firstName(),
-            'middle_initial' => fake()->randomLetter(),
+            'middle_name' => fake()->randomLetter(),
             'office_id' => Office::inRandomOrder()->first()?->id ?? Office::factory(),
         ];
     }
