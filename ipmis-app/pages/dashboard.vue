@@ -18,11 +18,15 @@
 
         <div class="flex justify-between items-center w-full px-4 py-2">
           <div class="flex items-center gap-2 text-left">
-            <h3 class="scroll-m-20 text-4xl font-semibold tracking-tight transition-colors first:mt-0 text-textsecondary font-quintessential">
-              Benguet Infrastructure Project Monitoring System</h3>
+            <h3 class="text-2xl sm:text-xl md:text-2xl lg:text-3xl font-semibold tracking-tight text-textsecondary font-quintessential">
+              <span class="sm:hidden">BIPMS</span>
+              <span class="hidden sm:inline">
+                Benguet Infrastructure Project Monitoring System
+              </span>
+            </h3>
           </div>
           <div class="flex items-center gap-2">
-             <p>{{ currentUser?.name || 'Loading...' }}</p>
+            <p>{{ currentUser?.name || 'Loading...' }}</p>
             <Menu as="div" class="relative">
               <MenuButton class="-m-1.5 flex items-center p-1.5">
                 <span class="sr-only">Open user menu</span>
@@ -85,7 +89,7 @@ import {
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
 
 const userNavigation = [
-  { name: 'Your profile', href: '#' },
+  { name: 'My account', href: '/dashboard/settings/account' },
   { name: 'Sign out', href: '/logout' },
 ]
 

@@ -1,6 +1,6 @@
 <template>
-    <div class="flex items-center justify-center min-h-screen bg-gray-100">
-        <Card class="w-[450px] bg-cardbg text-textsecondary">
+    <div class="flex items-center justify-center min-h-screen px-4 sm:px-6">
+        <Card class="w-full max-w-md sm:max-w-sm bg-cardbg text-textsecondary border border-jetblack">
             <CardHeader>
                 <div class="flex flex-col items-center text-center gap-2 sm:mx-auto sm:w-full sm:max-w-sm">
                     <img src="/logo.png" class="h-20 w-20" alt="Logo" />
@@ -35,10 +35,10 @@
                                 :errorMessage="errorBag.password_confirmation" v-if="props.formType == 'signup'"
                                 label="Password Confirmation" name="password_confirmation" type="password"
                                 autocomplete="current-password" required labelFor="password" class="my-5" />
-                            <div class="text-sm text-end" v-else>
+                            <!-- <div class="text-sm text-end" v-else>
                                 <a href="#" class="font-semibold text-jetblack hover:text-jetblack">Forgot
                                     password?</a>
-                            </div>
+                            </div> -->
                         </div>
 
                         <div class="flex flex-col items-center text-center gap-2 sm:mx-auto sm:w-full sm:max-w-sm text-textprimary">
@@ -53,7 +53,7 @@
                 </div>
             </CardContent>
             <CardFooter>
-                <div class="flex flex-col items-center text-center gap-2 sm:mx-auto sm:w-full sm:max-w-sm">
+                <!-- <div class="flex flex-col items-center text-center gap-2 sm:mx-auto sm:w-full sm:max-w-sm">
                     <p class="mt-10 text-center text-sm text-textsecondary">
                         <span v-if="props.formType != 'signup'">
                             Not registered?
@@ -70,7 +70,7 @@
                             </NuxtLink>
                         </span>
                     </p>
-                </div>
+                </div> -->
 
             </CardFooter>
         </Card>

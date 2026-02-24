@@ -5,8 +5,8 @@
         <TableSkeleton />
     </div>
     <div v-else class="flex min-h-screen w-full flex-col bg-mainbg px-4 py-4">
-        <div class="flex justify-between items-center">
-            <div class="space-x-2">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <Button @click="setFilter('all')"
                     :class="filterType === 'all' ? 'bg-black text-white' : 'bg-gray-200 text-gray-800'">All</Button>
                 <Button @click="setFilter('assigned')"

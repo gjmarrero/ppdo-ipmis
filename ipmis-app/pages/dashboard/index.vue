@@ -13,7 +13,7 @@
             </form>
 
         </div>
-        <div>
+        <div v-if="user.role === '1' || user.role === 'ppdoDevStaff' || user.role === 'ppdoDevChief'">
             <Heading as="h4">Project Proposals (PPDO-Project Dev Division)</Heading>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 m-3">
                 <NuxtLink :to="buildRoute('/dashboard/projects', 'all')">
@@ -43,7 +43,7 @@
             </div>
         </div>
 
-        <div>
+        <div v-if="user.role === '1' || user.role === 'ppdoMonitoringStaff' || user.role === 'ppdoMonitoringChief'">
             <Heading as="h4">Funded Projects</Heading>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 m-3">
                 <NuxtLink :to="buildRoute('/dashboard/funded_projects', 'all')">
@@ -70,7 +70,7 @@
             </div>
         </div>
 
-        <div>
+        <div v-if="user.role === '1' || user.role === 'peoPlanningStaff' || user.role === 'peoPlanningChief'">
             <Heading as="h4">Pre-engineering</Heading>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 m-3">
                 <NuxtLink :to="buildRoute('/dashboard/preengineerings/program_of_work', 'for_pow')">
@@ -102,7 +102,7 @@
             </div>
         </div>
 
-        <div>
+        <div v-if="user.role === '1' || user.role === 'benroStaff' || user.role === 'benroChief'">
             <Heading as="h4">Environmental Clearance</Heading>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 m-3">
                 <NuxtLink :to="buildRoute('/dashboard/environmental_clearances', 'for_processing')">
@@ -129,97 +129,12 @@
             </div>
         </div>
 
-        <!-- <div>
-            <Heading as="h4">Project Proposals (PPDO-Project Dev Division)</Heading>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 m-3">
-                <DashboardStatCard title="Project Proposals" subtitle="Total project proposals"
-                    :count="count_project_proposals" :onClick="() => navigateToFilteredProjects('all')" />
-                <DashboardStatCard title="Validated Proposals" subtitle="Total validated proposals"
-                    :count="count_validated_proposals" :onClick="() => navigateToFilteredProjects('validated')" />
-                <DashboardStatCard title="My Assignments" subtitle="For Validation"
-                    :count="count_validation_assignments"
-                    :onClick="() => navigateToFilteredProjects('my_assignment')" />
-            </div>
-        </div>
-        <Separator class="my-6" />
-        <div>
-            <Heading as="h4">Environmental (BENRO)</Heading>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 m-3">
-                <DashboardStatCard title="Funded Projects" subtitle="Total funded projects"
-                    :count="count_funded_projects" :onClick="() => navigateToFilteredEnvironmentalClearances('all')" />
-                <DashboardStatCard title="For Processing" subtitle="Total projects for processing"
-                    :count="count_for_ec_processing"
-                    :onClick="() => navigateToFilteredEnvironmentalClearances('for_processing')" />
-                <DashboardStatCard title="Processed ECC/CNC" subtitle="Total projects processed"
-                    :count="count_ec_processed"
-                    :onClick="() => navigateToFilteredEnvironmentalClearances('clearance_issued')" />
-            </div>
-        </div>
-        <Separator class="my-6" />
-        <div>
-            <Heading as="h4">Preengineering (PEO)</Heading>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 m-3">
-                <DashboardStatCard title="Funded Projects" subtitle="Total funded projects"
-                    :count="count_funded_projects" :onClick="() => navigateToFilteredPreengineerings('all')" />
-                <DashboardStatCard title="For Processing" subtitle="Total projects for preengineering"
-                    :count="count_for_preeng_processing"
-                    :onClick="() => navigateToFilteredPreengineerings('unpreengineered')" />
-                <DashboardStatCard title="Processed" subtitle="Total projects with preengineering"
-                    :count="count_preeng_processed"
-                    :onClick="() => navigateToFilteredPreengineerings('preengineered')" />
-                <DashboardStatCard title="My Assignments" subtitle="For processing" :count="count_my_assignment"
-                    :onClick="() => navigateToFilteredPreengineerings('assigned')" />
-            </div>
-        </div>
-        <Separator class="my-6" /> -->
-        <!-- <div>
-            <Heading as="h4">Implementation (PEO)</Heading>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 m-3">
-                <DashboardStatCard title="Funded Projects" subtitle="Total funded projects"
-                    :count="count_funded_projects" :onClick="() => navigateToFilteredEnvironmentalClearances('all')" />
-                <DashboardStatCard title="For Processing" subtitle="Total projects for processing"
-                    :count="count_for_ec_processing"
-                    :onClick="() => navigateToFilteredEnvironmentalClearances('for_processing')" />
-                <DashboardStatCard title="Processed ECC/CNC" subtitle="Total projects processed"
-                    :count="count_ec_processed"
-                    :onClick="() => navigateToFilteredEnvironmentalClearances('clearance_issued')" />
-            </div>
-        </div> -->
-        <!-- <Separator class="my-6" />
-        <div>
-            <Heading as="h4">Funded Projects</Heading>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 m-3">
-                <DashboardStatCard title="Funded Projects" subtitle="Total funded projects"
-                    :count="count_funded_projects" :onClick="() => navigateToFilteredFundedProjects('all')" />
-                <DashboardStatCard title="Validated Projects" subtitle="Projects with validation"
-                    :count="count_validated_funded_projects"
-                    :onClick="() => navigateToFilteredFundedProjects('validated')" />
-                <DashboardStatCard title="Programmed Projects" subtitle="With preengineering status"
-                    :count="count_programmed_funded_projects"
-                    :onClick="() => navigateToFilteredFundedProjects('programmed')" />
-                <DashboardStatCard title="Ongoing Procurement" subtitle="Projects under procurement"
-            :count="count_procurement_projects" />
-            </div>
-            <div
-                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 m-3 place-items-center border rounded border-jetblack bg-platinum">
-                <div class="w-[400px] h-[400px] m-6">
-                    <Pie v-if="chartDataValidatedFunded.labels.length" :data="chartDataValidatedFunded"
-                        :options="chartOptions" />
-                </div>
-
-                <div class="w-[400px] h-[400px]">
-                    <Pie v-if="chartDataProgrammedFunded.labels.length" :data="chartDataProgrammedFunded"
-                        :options="chartOptions" />
-                </div>
-            </div>
-        </div> -->
-        <!-- <Separator class="my-6" />
         <div class="w-full px-4">
             <Heading as="h4">Projects per Fund Source</Heading>
             <div class="flex flex-row w-full gap-6 mt-4">
-                <div class="flex-1 bg-platinum shadow rounded-lg p-6 border border-jetblack">
+                <div class="flex-1 bg-cardbg shadow rounded-lg p-6 border border-jetblack">
                     <table class="min-w-full border rounded-lg overflow-hidden">
-                        <thead class="bg-gray-300">
+                        <thead class="bg-cardbg-300">
                             <tr>
                                 <th class="px-4 py-2 border-b border-jetblack text-left">Fund Source</th>
                                 <th class="px-4 py-2 border-b border-jetblack text-center">Projects Count</th>
@@ -233,9 +148,9 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="flex-1 bg-platinum border border-jetblack shadow rounded-lg p-6">
-                    <Card>
-                        <CardContent class="flex justify-center items-center bg-platinum">
+                <div class="flex-1 bg-cardbg border border-jetblack shadow rounded-lg p-6">
+                    <Card class="border border-cardbg">
+                        <CardContent class="flex justify-center items-center bg-cardbg">
                             <div class="w-[400px] h-[400px]">
                                 <Pie v-if="chartData.labels.length" :data="chartData" :options="chartOptions" />
                             </div>
@@ -251,14 +166,14 @@
                     </div>
                 </div>
             </div>
-        </div> -->
-        <!-- <Separator class="my-6" />
+        </div>
+        <Separator class="my-6" />
         <div class="w-full rounded-lg px-6">
             <Heading as="h4">Projects per Municipality</Heading>
             <div class="flex flex-row w-full gap-6 mt-4">
-                <div class="flex-1 bg-platinum shadow rounded-lg p-6">
+                <div class="flex-1 bg-cardbg shadow rounded-lg p-6">
                     <table class="min-w-full rounded-lg overflow-hidden">
-                        <thead class="bg-gray-300">
+                        <thead class="bg-cardbg-300">
                             <tr>
                                 <th class="px-4 py-2 border-b border-jetblack text-left">Municipality</th>
                                 <th class="px-4 py-2 border-b border-jetblack text-center">Projects Count</th>
@@ -272,9 +187,9 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="flex-1 bg-platinum shadow rounded-lg p-6">
-                    <Card>
-                        <CardContent class="flex justify-center items-center bg-platinum">
+                <div class="flex-1 bg-cardbg shadow rounded-lg p-6">
+                    <Card class="border border-cardbg">
+                        <CardContent class="flex justify-center items-center bg-cardbg">
                             <div class="w-[400px] h-[400px]">
                                 <Pie v-if="chartDataMunicipality.labels.length" :data="chartDataMunicipality"
                                     :options="chartOptions" />
@@ -283,49 +198,54 @@
                     </Card>
                 </div>
             </div>
+        </div>
+        <!-- <Separator class="my-6" />
+        <div class="grid grid-cols-4 md:grid-cols-4 gap-2 flex-grow">
+            <Card>
+                <CardHeader>
+                    <CardDescription>Funded Projects</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    No. of funded projects
+                    <h2
+                        class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
+                        {{ count_funded_projects }}</h2>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardDescription>Validated Funded Projects</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    No. of validated funded projects
+                    <h2
+                        class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
+                        {{ count_validated_funded_projects }}</h2>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardDescription>Programmed Funded Projects</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    No. of programmed funded projects
+                    <h2
+                        class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
+                        {{ count_programmed_funded_projects }}</h2>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardDescription>Ongoing Procurement</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    No. of funded projects w/ ongoing procurement
+                </CardContent>
+            </Card>
         </div> -->
-        <!-- <div class="grid grid-cols-4 md:grid-cols-4 gap-2 flex-grow">
-        <Card>
-            <CardHeader>
-                <CardDescription>Funded Projects</CardDescription>
-            </CardHeader>
-            <CardContent>
-                No. of funded projects
-                <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
-                    {{ count_funded_projects }}</h2>
-            </CardContent>
-        </Card>
-
-        <Card>
-            <CardHeader>
-                <CardDescription>Validated Funded Projects</CardDescription>
-            </CardHeader>
-            <CardContent>
-                No. of validated funded projects
-                <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
-                    {{ count_validated_funded_projects }}</h2>
-            </CardContent>
-        </Card>
-
-        <Card>
-            <CardHeader>
-                <CardDescription>Programmed Funded Projects</CardDescription>
-            </CardHeader>
-            <CardContent>
-                No. of programmed funded projects
-                <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">{{ count_programmed_funded_projects }}</h2>
-            </CardContent>
-        </Card>
-
-        <Card>
-            <CardHeader>
-                <CardDescription>Ongoing Procurement</CardDescription>
-            </CardHeader>
-            <CardContent>
-                No. of funded projects w/ ongoing procurement
-            </CardContent>
-        </Card>
-    </div> -->
 
     </div>
 </template>
@@ -417,237 +337,127 @@ const fetchDashboardCounts = async () => {
     Object.assign(counts, response.data)
 }
 
-// const count_project_proposals = ref()
-// const fetchProjectProposals = async () => {
-//     const response = await api.get('/api/countProjectProposals', {
-//         params: {
-//             yearFunded: filterForm.yearFunded
-//         }
-//     })
-//     count_project_proposals.value = response.data
-// }
-
-// const count_validated_proposals = ref()
-// const fetchValidatedProposals = async () => {
-//     const response = await api.get('/api/countValidatedProposals')
-//     count_validated_proposals.value = response.data
-// }
-
-// const count_validation_assignments = ref()
-// const fetchValidationAssignments = async (employee) => {
-//     const response = await api.get(`/api/countValidationAssignments/${employee}`)
-//     count_validation_assignments.value = response.data
-// }
-// const count_funded_projects = ref()
-// const fetchCountFundedProjects = async () => {
-//     const response = await api.get('/api/countFundedProjects')
-//     count_funded_projects.value = response.data
-// }
-
-// const count_validated_funded_projects = ref()
-// const fetchCountValidatedFundedProjects = async () => {
-//     const response = await api.get('/api/countValidatedFundedProjects')
-//     count_validated_funded_projects.value = response.data
-// }
-
-// const count_programmed_funded_projects = ref()
-// const fetchProgrammedFundedProjects = async () => {
-//     const response = await api.get('/api/countProgrammedFundedProjects')
-//     count_programmed_funded_projects.value = response.data
-// }
-
-// const projectCountsByFundsource = ref([])
-// const fetchProjectCountsByFundsource = async () => {
-//     const response = await api.get('/api/countProjectsByFundsource')
-//     projectCountsByFundsource.value = response.data
-// }
-
-// const count_for_ec_processing = ref()
-// const fetchCountForEcProcessing = async () => {
-//     const response = await api.get('/api/countForEcProcessing')
-//     count_for_ec_processing.value = response.data
-// }
-
-// const count_ec_processed = ref()
-// const fetchCountEcProcessed = async () => {
-//     const response = await api.get('/api/countEcProcessed')
-//     count_ec_processed.value = response.data
-// }
-
-// const count_for_preeng_processing = ref()
-// const fetchCountForPreengProcessing = async () => {
-//     const response = await api.get('/api/countForPreengProcessing')
-//     count_for_preeng_processing.value = response.data
-// }
-
-// const count_preeng_processed = ref()
-// const fetchCountPreengProcessed = async () => {
-//     const response = await api.get('/api/countPreengProcessed')
-//     count_preeng_processed.value = response.data
-// }
-
-// const count_my_assignment = ref()
-// const fetchCountMyAssignment = async () => {
-//     console.log("User emp id", user.value.employee_id)
-//     const response = await api.get(`/api/countMyAssignment/${user.value.employee_id}`)
-//     count_my_assignment.value = response.data
-// }
-
-// const navigateToFilteredProjects = (filterType) => {
-//     navigateTo({
-//         path: '/dashboard/projects',
-//         query: {
-//             filter: filterType,
-//         }
-//     })
-// }
-
-// const navigateToFilteredFundedProjects = (filterType) => {
-//     navigateTo({
-//         path: '/dashboard/funded_projects',
-//         query: {
-//             filter: filterType,
-//         }
-//     })
-// }
-
-// const navigateToFilteredEnvironmentalClearances = (filterType) => {
-//     navigateTo({
-//         path: '/dashboard/environmental_clearances',
-//         query: {
-//             filter: filterType,
-//         }
-//     })
-// }
-
-// const navigateToFilteredPreengineerings = (filterType) => {
-//     navigateTo({
-//         path: '/dashboard/preengineerings',
-//         query: {
-//             filter: filterType,
-//         }
-//     })
-// }
-
-// const chartOptions = {
-//     responsive: true,
-//     plugins: {
-//         legend: {
-//             position: "bottom",
-//         },
-//         tooltip: {
-//             callbacks: {
-//                 label: function (context) {
-//                     const label = context.label || ""
-//                     const value = context.raw
-//                     const total = context.chart._metasets[0].total
-//                     const percentage = ((value / total) * 100).toFixed(1)
-//                     return `${label}: ${value} (${percentage}%)`
-//                 }
-//             }
-//         }
-//     }
-// }
 
 
-// const fundSourceCounts = ref({})
-// const chartData = ref({
-//     labels: [],
-//     datasets: []
-// })
+const chartOptions = {
+    responsive: true,
+    plugins: {
+        legend: {
+            position: "bottom",
+        },
+        tooltip: {
+            callbacks: {
+                label: function (context) {
+                    const label = context.label || ""
+                    const value = context.raw
+                    const total = context.chart._metasets[0].total
+                    const percentage = ((value / total) * 100).toFixed(1)
+                    return `${label}: ${value} (${percentage}%)`
+                }
+            }
+        }
+    }
+}
 
-// const fetchFundSourceCounts = async () => {
-//     const { data } = await api.get('/api/dashboard/count_by_fundsource')
-//     fundSourceCounts.value = data
-//     chartData.value = {
-//         labels: data.map(item => item.fundsource.fundsource),
-//         datasets: [
-//             {
-//                 data: data.map(item => item.total),
-//                 backgroundColor: ['#8884d8', '#82ca9d', '#ffc658', '#ff7f7f', '#00C49F', '#a4de6c', '#d0ed57']
-//             }
-//         ]
-//     }
-// }
 
-// const municipalityCounts = ref([])
-// const chartDataMunicipality = ref({
-//     labels: [],
-//     datasets: []
-// })
-// const fetchMunicipalityCounts = async () => {
-//     const { data } = await api.get('/api/dashboard/count_by_municipality')
-//     municipalityCounts.value = data
-//     chartDataMunicipality.value = {
-//         labels: data.map(item => item.municipality),
-//         datasets: [
-//             {
-//                 data: data.map(item => item.total),
-//                 backgroundColor: ['#8884d8', '#82ca9d', '#ffc658', '#ff7f7f', '#00C49F', '#a4de6c', '#d0ed57', '#8dd1e1', '#83a6ed', '#d888d8', '#c6b5e9', '#f7a8a8', '#f5d0a9']
-//             }
-//         ]
-//     }
-// }
+const fundSourceCounts = ref({})
+const chartData = ref({
+    labels: [],
+    datasets: []
+})
 
-// const unvalidatedFunded = computed(() => {
-//     if (count_funded_projects.value == null || count_validated_funded_projects.value == null) {
-//         return 0
-//     }
-//     return count_funded_projects.value - count_validated_funded_projects.value
-// })
+const fetchFundSourceCounts = async () => {
+    const { data } = await api.get('/api/dashboard/count_by_fundsource')
+    fundSourceCounts.value = data
+    chartData.value = {
+        labels: data.map(item => item.fundsource.fundsource),
+        datasets: [
+            {
+                data: data.map(item => item.total),
+                backgroundColor: ['#8884d8', '#82ca9d', '#ffc658', '#ff7f7f', '#00C49F', '#a4de6c', '#d0ed57']
+            }
+        ]
+    }
+}
 
-// const chartDataValidatedFunded = computed(() => ({
-//     labels: ["Validated", "Not Validated"],
-//     datasets: [
-//         {
-//             data: [
-//                 count_validated_funded_projects.value ?? 0,
-//                 unvalidatedFunded.value ?? 0
-//             ],
-//             backgroundColor: ["#A5D6A7", "#EF9A9A"],
-//         },
-//     ],
-// }))
+const municipalityCounts = ref([])
+const chartDataMunicipality = ref({
+    labels: [],
+    datasets: []
+})
+const fetchMunicipalityCounts = async () => {
+    const { data } = await api.get('/api/dashboard/count_by_municipality')
+    municipalityCounts.value = data
+    chartDataMunicipality.value = {
+        labels: data.map(item => item.municipality),
+        datasets: [
+            {
+                data: data.map(item => item.total),
+                backgroundColor: ['#8884d8', '#82ca9d', '#ffc658', '#ff7f7f', '#00C49F', '#a4de6c', '#d0ed57', '#8dd1e1', '#83a6ed', '#d888d8', '#c6b5e9', '#f7a8a8', '#f5d0a9']
+            }
+        ]
+    }
+}
 
-// chartDataValidatedFunded.value = {
-//     labels: ["Validated", "Not Validated"],
-//     datasets: [
-//         {
-//             data: [count_validated_funded_projects.value, unvalidatedFunded.value],
-//             backgroundColor: ["#A5D6A7", "#EF9A9A"],
-//         },
-//     ],
-// }
+const unvalidatedFunded = computed(() => {
+    if (counts.funded_projects == null || counts.validated_funded_projects == null) {
+        return 0
+    }
+    return counts.funded_projects - counts.validated_funded_projects
+})
 
-// const unprogrammedFunded = computed(() => {
-//     if (count_funded_projects.value == null || count_programmed_funded_projects.value == null) {
-//         return 0
-//     }
-//     return count_funded_projects.value - count_programmed_funded_projects.value
-// })
+const chartDataValidatedFunded = computed(() => ({
+    labels: ["Validated", "Not Validated"],
+    datasets: [
+        {
+            data: [
+                counts.validated_funded_projects ?? 0,
+                unvalidatedFunded.value ?? 0
+            ],
+            backgroundColor: ["#A5D6A7", "#EF9A9A"],
+        },
+    ],
+}))
 
-// const chartDataProgrammedFunded = computed(() => ({
-//     labels: ["Programmed", "Unprogrammed"],
-//     datasets: [
-//         {
-//             data: [
-//                 count_programmed_funded_projects.value ?? 0,
-//                 unprogrammedFunded.value ?? 0
-//             ],
-//             backgroundColor: ["#A5D6A7", "#EF9A9A"],
-//         },
-//     ],
-// }))
+chartDataValidatedFunded.value = {
+    labels: ["Validated", "Not Validated"],
+    datasets: [
+        {
+            data: [counts.validated_funded_projects, unvalidatedFunded.value],
+            backgroundColor: ["#A5D6A7", "#EF9A9A"],
+        },
+    ],
+}
 
-// chartDataProgrammedFunded.value = {
-//     labels: ["Programmed", "Unprogrammed"],
-//     datasets: [
-//         {
-//             data: [count_programmed_funded_projects.value, unprogrammedFunded.value],
-//             backgroundColor: ["#A5D6A7", "#EF9A9A"],
-//         },
-//     ],
-// }
+const unprogrammedFunded = computed(() => {
+    if (counts.funded_projects == null || counts.preengineered_projects == null) {
+        return 0
+    }
+    return counts.funded_projects - counts.preengineered_projects
+})
+
+const chartDataProgrammedFunded = computed(() => ({
+    labels: ["Programmed", "Unprogrammed"],
+    datasets: [
+        {
+            data: [
+                counts.preengineered_projects ?? 0,
+                unprogrammedFunded.value ?? 0
+            ],
+            backgroundColor: ["#A5D6A7", "#EF9A9A"],
+        },
+    ],
+}))
+
+chartDataProgrammedFunded.value = {
+    labels: ["Programmed", "Unprogrammed"],
+    datasets: [
+        {
+            data: [counts.preengineered_projects, unprogrammedFunded.value],
+            backgroundColor: ["#A5D6A7", "#EF9A9A"],
+        },
+    ],
+}
 
 const fetchAllCounts = async () => {
     await Promise.all([
@@ -663,6 +473,12 @@ const handleFilterFormSubmit = async () => {
 
 onMounted(async () => {
     fetchAllCounts()
+    fetchFundSourceCounts()
+    fetchMunicipalityCounts()
+})
+
+definePageMeta({
+  middleware: ['auth']
 })
 
 </script>

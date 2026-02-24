@@ -81,6 +81,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/users', [UserController::class, 'index']);
     Route::post('/user', [UserController::class, 'store']);
+    Route::put('/user/account', [UserController::class, 'updateAccount']);
+    Route::put('/user/password', [UserController::class, 'updatePassword']);
+    
 
     Route::get('/odsus', [OdsuController::class, 'index']);
     Route::post('/odsu', [OdsuController::class, 'store']);

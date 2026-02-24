@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Hash;
 
@@ -36,5 +37,39 @@ class UserController extends Controller
             'message' => 'Registration successful',
             'user' => $user,
         ]);
+    }
+
+    public function updateAccount(Request $request) {
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'email' => 'required|email|max:255',
+        ]);
+
+        $user->update($validated);
+
+        return response()->json($user);
+    }
+
+    public function updatePassword(Request $request) {
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'current_password' => 'required',
+            'password' => 'required|string|min:8',
+        ]);
+
+        if (!Hash::check($validated['current_password'], $user->password)) {
+            return response()->json(['message' => 'Current password is incorrect'], 422);
+        }
+
+        $user->password = Hash::make($validated['password']);
+        $user->save();
+
+        // Auth::logout();
+        // $request->session()->invalidate();
+        // $request->session()->regenerateToken();
+
+        return response()->json(['message' => 'Password updated. Please log in again.']);
     }
 }

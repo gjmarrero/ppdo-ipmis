@@ -10,7 +10,7 @@
 
             <!-- Otherwise fallback to FormInput -->
             <FormInput v-else v-model="model" :name="name" :type="type" :autocomplete="autocomplete"
-                :required="required" :placeholder="placeholder" :class="inputClass" @blur="$emit('blur', $event)" />
+                :required="required" :placeholder="placeholder" :class="inputClass" @blur="$emit('blur', $event)" :readonly="readonly" :disabled="disabled"/>
         </div>
 
         <p v-if="errorMessage" class="mt-2 text-sm text-red-600">
@@ -30,6 +30,8 @@ defineProps({
     autocomplete: String,
     inputClass: String,
     labelClass: String,
+    readonly: Boolean,
+    disabled: Boolean,
     errorMessage: {
         type: String,
         default: '',
@@ -43,4 +45,5 @@ const model = defineModel()
 //     get: () => props.modelValue,
 //     set: val => emit('update:modelValue', val)
 // })
+
 </script>

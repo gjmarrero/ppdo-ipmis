@@ -64,7 +64,8 @@ export default function useSidebar() {
           href: '/dashboard/reports/projects',
           current: false
         }
-      ]
+      ],
+      roles: ['1'],
     },
     {
       name: 'Settings',

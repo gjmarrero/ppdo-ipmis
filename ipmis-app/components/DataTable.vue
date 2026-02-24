@@ -57,7 +57,7 @@ const getColumn = (id: string) => table?.getColumn(id)
 <template>
     <div class="flex items-center py-4">
 
-        <div class="flex items-center py-4 gap-2">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <FormInput v-for="column in table.getAllColumns().filter(
                 c => c.columnDef.meta?.filterable)" :key="column.id" class="max-w-sm" :placeholder="`Filter ${column.id}`"
                 :model-value="column.getFilterValue() as string" @update:model-value="column.setFilterValue($event)" />
