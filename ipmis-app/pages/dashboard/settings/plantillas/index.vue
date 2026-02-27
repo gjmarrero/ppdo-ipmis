@@ -6,7 +6,7 @@
         </ClientOnly>
         <div class="flex min-h-screen w-full flex-col px-2 py-2">
             <SettingsPlantilla v-model:isSettingsAddDialogOpen="isSettingsAddDialogOpen" :settingsType="settingsType"
-                :plantillaToEdit="selectedPlantilla" @settingAdded="handleSettingAddition" />
+                :plantillaToEdit="selectedPlantilla" @settingAdded="handleSettingAddition" :mode="mode" />
             <DataTable :columns="columns" :data="plantillas" :key="tableKey" />
         </div>
     </div>
@@ -37,8 +37,11 @@ const handleDelete = async (plantilla) => {
 
 const selectedPlantilla = ref(null)
 
+const mode = ref('add')
+
 const handleEdit = async (plantilla) => {
     selectedPlantilla.value = plantilla
+    mode.value = 'edit'
     isSettingsAddDialogOpen.value = true
 }
 

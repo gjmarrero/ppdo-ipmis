@@ -6,7 +6,7 @@
         </ClientOnly>
         <div class="flex min-h-screen w-full flex-col px-2 py-2">
             <SettingsScopeOfWork v-model:isSettingsAddDialogOpen="isSettingsAddDialogOpen" :settingsType="settingsType"
-                :scopeOfWorkToEdit="selectedScopeOfWork" @settingAdded="handleSettingAddition" />
+                :scopeOfWorkToEdit="selectedScopeOfWork" @settingAdded="handleSettingAddition" :mode="mode"/>
             <DataTable :columns="columns" :data="scopes_of_work" :key="tableKey" />
         </div>
     </div>
@@ -37,8 +37,11 @@ const handleDelete = async (scopeOfWork) => {
 
 const selectedScopeOfWork = ref(null)
 
+const mode = ref('add')
+
 const handleEdit = async (scopeOfWork) => {
     selectedScopeOfWork.value = scopeOfWork
+    mode.value = 'edit'
     isSettingsAddDialogOpen.value = true
 }
 

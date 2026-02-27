@@ -6,7 +6,7 @@
     <Dialog :open="props.isSettingsAddDialogOpen" @update:open="(val) => emit('update:isSettingsAddDialogOpen', val)">
         <DialogContent class="bg-dialogbg text-textsecondary">
             <DialogHeader>
-                <DialogTitle>Add</DialogTitle>
+                <DialogTitle>{{(dialogTitle.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()))}}</DialogTitle>
             </DialogHeader>
             <div v-if="settingsType === 'position'">
                 <form @submit.prevent="handlePositionFormSubmit">
@@ -36,6 +36,10 @@ const { errorBag } = useAuth()
 const props = defineProps({
     isSettingsAddDialogOpen: Boolean,
     settingsType: String,
+    mode: {
+        type: String,
+        default: 'add',
+    },
     positionToEdit: {
         type: Object,
         default: null,
@@ -94,6 +98,14 @@ watch(() => props.positionToEdit, (newVal) => {
         positionForm.title = ''
     }
 }, { immediate: true })
+
+const dialogTitle = ref('add')
+
+watch(() => props.mode, (newVal) => {
+    if(newVal) {
+        dialogTitle.value = newVal
+    }
+})
 
 onMounted(() => {
     fetchOdsus()

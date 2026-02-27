@@ -16,18 +16,18 @@ import {
 } from '@/components/ui/alert-dialog'
 
 export const getColumns = (onView: (position: Position) => void, onDelete: (position: Position) => void, onEdit: (position: Position) => void): ColumnDef<Position>[] => [
-    {
-        accessorKey: 'id',
-        header: ({ column }) =>
-            h(Button, {
-                variant: 'ghost',
-                onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-            }, () => ['Id', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]),
-        cell: ({ row }) => h('div', { class: 'propercase' }, row.getValue('id')),
-        meta: {
-            filterable: true,
-        },
-    },
+    // {
+    //     accessorKey: 'id',
+    //     header: ({ column }) =>
+    //         h(Button, {
+    //             variant: 'ghost',
+    //             onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+    //         }, () => ['Id', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]),
+    //     cell: ({ row }) => h('div', { class: 'propercase' }, row.getValue('id')),
+    //     meta: {
+    //         filterable: true,
+    //     },
+    // },
     {
         accessorKey: 'odsu',
         header: ({ column }) =>

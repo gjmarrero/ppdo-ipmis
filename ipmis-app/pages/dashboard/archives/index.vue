@@ -4,9 +4,10 @@
         <ClientOnly>
             <Toaster />
         </ClientOnly>
-        <Heading>Archives</Heading>
         <div class="flex min-h-screen w-full flex-col px-2 py-2">
-            <Button class="w-42" @click="openAddArchive">Add Document</Button>
+            <div class="flex flex-row justify-end">
+                <Button variant="newprimary" class="w-42" @click="openAddArchive">Add Document</Button>
+            </div>
 
             <ArchiveAdd v-if="isArchiveDrawerOpen" v-model:isOpen="isArchiveDrawerOpen"
                 @archiveAdded="handleArchiveAddition" />

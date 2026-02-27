@@ -6,7 +6,7 @@
     <Dialog :open="props.isSettingsAddDialogOpen" @update:open="(val) => emit('update:isSettingsAddDialogOpen', val)">
         <DialogContent class="bg-dialogbg text-textsecondary">
             <DialogHeader>
-                <DialogTitle>Add</DialogTitle>
+                <DialogTitle>{{(dialogTitle.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()))}}</DialogTitle>
             </DialogHeader>
             <div v-if="settingsType === 'employee'">
                 <form @submit.prevent="handleEmployeeFormSubmit">
@@ -37,6 +37,10 @@ const { errorBag } = useAuth()
 const props = defineProps({
     isSettingsAddDialogOpen: Boolean,
     settingsType: String,
+    mode: {
+        type: String,
+        default: 'add',
+    },
     employeeToEdit: {
         type: Object,
         default: null,
@@ -93,6 +97,11 @@ watch(() => props.employeeToEdit, (newVal) => {
     }
 }, { immediate: true })
 
-onMounted(() => {
+const dialogTitle = ref('add')
+
+watch(() => props.mode, (newVal) => {
+    if(newVal) {
+        dialogTitle.value = newVal
+    }
 })
 </script>

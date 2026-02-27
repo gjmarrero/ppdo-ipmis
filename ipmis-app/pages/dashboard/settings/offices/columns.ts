@@ -16,15 +16,15 @@ import {
 } from '@/components/ui/alert-dialog'
 
 export const getColumns = (onView: (office: Office) => void, onDelete: (office: Office) => void, onEdit: (office: Office) => void): ColumnDef<Office>[] => [
-    {
-        accessorKey: 'id',
-        header: ({ column }) =>
-            h(Button, {
-                variant: 'ghost',
-                onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-            }, () => ['Id', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]),
-        cell: ({ row }) => h('div', { class: 'propercase' }, row.getValue('id')),
-    },
+    // {
+    //     accessorKey: 'id',
+    //     header: ({ column }) =>
+    //         h(Button, {
+    //             variant: 'ghost',
+    //             onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+    //         }, () => ['Id', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]),
+    //     cell: ({ row }) => h('div', { class: 'propercase' }, row.getValue('id')),
+    // },
     {
         accessorKey: 'office',
         header: ({ column }) =>

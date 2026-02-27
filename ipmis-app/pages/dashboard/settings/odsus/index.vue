@@ -6,7 +6,7 @@
         </ClientOnly>
         <div class="flex min-h-screen w-full flex-col px-2 py-2">
             <SettingsOdsu v-model:isSettingsAddDialogOpen="isSettingsAddDialogOpen" :settingsType="settingsType"
-                :odsuToEdit="selectedOdsu" @settingAdded="handleSettingAddition" />
+                :odsuToEdit="selectedOdsu" @settingAdded="handleSettingAddition" :mode="mode" />
             <DataTable :columns="columns" :data="odsus" :key="tableKey" />
         </div>
     </div>
@@ -39,8 +39,11 @@ const handleDelete = async (odsu) => {
 
 const selectedOdsu = ref(null)
 
+const mode = ref('add')
+
 const handleEdit = async (odsu) => {
     selectedOdsu.value = odsu
+    mode.value = 'edit'
     isSettingsAddDialogOpen.value = true
 }
 

@@ -7,7 +7,7 @@
         @update:open="(val) => emit('update:isSettingsAddDialogOpen', val)">
         <DialogContent class="bg-dialogbg border border-drawerborder text-textsecondary">
             <DialogHeader>
-                <DialogTitle>Add</DialogTitle>
+                <DialogTitle>{{(dialogTitle.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()))}}</DialogTitle>
             </DialogHeader>
             <div v-if="settingsType === 'odsu'">
                 <form @submit.prevent="handleOdsuFormSubmit">
@@ -37,6 +37,10 @@ const { errorBag } = useAuth()
 const props = defineProps({
     isSettingsAddDialogOpen: Boolean,
     settingsType: String,
+    mode: {
+        type: String,
+        default: 'add',
+    },
     odsuToEdit: {
         type: Object,
         default: null,
@@ -103,9 +107,16 @@ watch(() => props.odsuToEdit, (newVal) => {
     }
 }, { immediate: true })
 
+const dialogTitle = ref('add')
+
+watch(() => props.mode, (newVal) => {
+    if(newVal) {
+        dialogTitle.value = newVal
+    }
+})
+
 onMounted(() => {
     fetchOffices()
     fetchDivisions()
-    console.log("Settings Type:", props.settingsType)
 })
 </script>

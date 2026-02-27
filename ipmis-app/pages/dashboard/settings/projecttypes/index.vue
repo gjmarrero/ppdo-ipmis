@@ -5,6 +5,9 @@
             <Toaster />
         </ClientOnly>
         <div class="flex min-h-screen w-full flex-col px-2 py-2">
+            <div class="flex flex-row justify-end">
+                <Button @click="openDialog" variant="newprimary" class="w-40">Add</Button>
+            </div>
             <SettingsProjectType v-model:isSettingsAddDialogOpen="isSettingsAddDialogOpen" :settingsType="settingsType"
                 :projectTypeToEdit="selectedProjectType" @settingAdded="handleSettingAddition" />
             <DataTable :columns="columns" :data="projectTypes" :key="tableKey" />
@@ -23,8 +26,6 @@ const { api } = useAxios()
 
 const tableKey = ref(0)
 
-const settingsType = ref('project_type')
-
 const isSettingsAddDialogOpen = ref(false)
 
 const handleView = (project_type) => {
@@ -39,6 +40,11 @@ const handleDelete = async (project_type) => {
     fetchProjectTypes()
 }
 
+const openDialog = () => {
+    selectedProjectType.value = null
+    isSettingsAddDialogOpen.value = true
+}
+
 const selectedProjectType = ref(null)
 
 const handleEdit = async (project_type) => {
@@ -49,7 +55,6 @@ const handleEdit = async (project_type) => {
 const columns = getColumns(handleView, handleDelete, handleEdit)
 
 const handleSettingAddition = (updatedProjectType) => {
-    console.log("Updated plantilla", updatedProjectType)
     const index = projectTypes.value.findIndex(o => o.id === updatedProjectType.id)
     if (index !== -1) {
         projectTypes.value.splice(index, 1, updatedProjectType)
@@ -62,11 +67,11 @@ const handleSettingAddition = (updatedProjectType) => {
     toast({
         description: index !== -1 ? 'Successfully updated' : 'Successfully added'
     })
+    fetchProjectTypes()
 }
 
 onMounted(() => {
     fetchProjectTypes()
-    console.log("PTs", projectTypes)
 })
 </script>
 

@@ -6,7 +6,7 @@
         </ClientOnly>
         <div class="flex min-h-screen w-full flex-col px-2 py-2">
             <SettingsUser v-model:isSettingsAddDialogOpen="isSettingsAddDialogOpen" :settingsType="settingsType"
-                :userToEdit="selectedUser" @settingAdded="handleSettingAddition" />
+                :userToEdit="selectedUser" @settingAdded="handleSettingAddition" :mode="mode" />
             <DataTable :columns="columns" :data="users" :key="tableKey" />
         </div>
     </div>
@@ -20,6 +20,8 @@ import { toast, Toaster } from '@/components/ui/toast';
 const { api } = useAxios()
 
 const tableKey = ref(0)
+
+const dialogKey = ref(0)
 
 const settingsType = ref('user')
 
@@ -37,8 +39,12 @@ const handleDelete = async (user) => {
 
 const selectedUser = ref(null)
 
+const mode = ref('add')
+
 const handleEdit = async (user) => {
     selectedUser.value = user
+    console.log("Selected user", user)
+    mode.value = 'edit'
     isSettingsAddDialogOpen.value = true
 }
 
@@ -68,6 +74,12 @@ const handleSettingAddition = (updatedUser) => {
         description: index !== -1 ? 'Successfully updated' : 'Successfully added'
     })
 }
+
+// watch(isSettingsAddDialogOpen, (val) => {
+//   if (!val) {
+//     dialogKey.value++
+//   }
+// })
 
 onMounted(() => {
     fetchUsers()

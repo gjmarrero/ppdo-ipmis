@@ -210,10 +210,11 @@ watch(
     { deep: true }
 )
 const handleSubmit = async () => {
+    console.log("Props", props?.fundedProject)
     await submitFundedProject({
-        mode: props.mode,
-        projectId: props?.fundedProject.id || '',
-        fundedProjectId: props.fundedProject?.latest_funding?.id,
+        mode: props?.mode,
+        projectId: props?.fundedProject?.id || '',
+        fundedProjectId: props?.fundedProject?.latest_funding?.id || '', 
         onSuccess: () => {
             emit('form-submitted', props.mode)
             resetForm()

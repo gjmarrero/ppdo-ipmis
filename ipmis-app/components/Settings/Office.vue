@@ -2,16 +2,16 @@
     <Dialog :open="props.isSettingsAddDialogOpen" @update:open="(val) => emit('update:isSettingsAddDialogOpen', val)">
         <DialogContent class="bg-dialogbg text-textsecondary border border-drawerborder">
             <DialogHeader>
-                <DialogTitle>{{ isEditing ? 'Edit Project Type' : 'Add Project Type' }}</DialogTitle>
+                <DialogTitle>{{ isEditing ? 'Edit Office' : 'Add Office' }}</DialogTitle>
             </DialogHeader>
             <form @submit.prevent="handleSubmit">
-                <FormGroup v-model="projectTypeForm.project_type" :errorMessage="errorBag.project_type"
-                    label="Project Type" name="project_type" type="text" required labelFor="project_type"
-                    class="my-5" />
-
-                <FormGroup v-model="projectTypeForm.project_type_code" :errorMessage="errorBag.project_type_code"
-                    label="Project Type Code" name="project_type_code" type="text" required labelFor="project_type_code"
-                    class="my-5" />
+                <div class="mb-8">
+                    <FormGroup placeholder="Office" v-model="officeForm.office" name="office" label="Office name" />
+                </div>
+                <div class="mb-8">
+                    <FormGroup placeholder="Office Acc" v-model="officeForm.office_acc" name="office_acc"
+                        label="Office acc" />
+                </div>
 
                 <div class="flex flex-row justify-end text-textprimary">
                     <Button type="submit" variant="newprimary" size="lg" :disabled="isSubmitting">
@@ -26,13 +26,13 @@
 
 <script setup>
 
-const { projectTypeForm, submitProjectTypeForm, resetForm, isSubmitting } = useProjectTypes()
+const { officeForm, submitOfficeForm, resetForm, isSubmitting } = useOffices()
 
 const { errorBag } = useCustomError()
 
 const props = defineProps({
     isSettingsAddDialogOpen: Boolean,
-    projectTypeToEdit: {
+    officeToEdit: {
         type: Object,
         default: null,
     }
@@ -40,11 +40,11 @@ const props = defineProps({
 
 const emit = defineEmits(['update:isSettingsAddDialogOpen', 'settingAdded'])
 
-const isEditing = computed(() => !!props.projectTypeToEdit)
+const isEditing = computed(() => !!props.officeToEdit)
 
 const handleSubmit = async () => {
-    const data = await submitProjectTypeForm({
-        projectTypeToEdit: props.projectTypeToEdit,
+    const data = await submitOfficeForm({
+        officeToEdit: props.officeToEdit,
         onSuccess: () => {
             emit('form-submitted')
             emit('update:isSettingsAddDialogOpen', false)
@@ -53,14 +53,13 @@ const handleSubmit = async () => {
     emit('settingAdded', data)
 }
 
-watch(() => props.projectTypeToEdit, (newVal) => {
+watch(() => props.officeToEdit, (newVal) => {
     if (newVal) {
-        console.log("PT to edit", newVal)
-        projectTypeForm.project_type = newVal.name
-        projectTypeForm.project_type_code = newVal.project_type_code
+        officeForm.office = newVal.office
+        officeForm.office_acc = newVal.office_acc
     } else {
-        projectTypeForm.project_type = ''
-        projectTypeForm.project_type_code = ''
+        officeForm.office = ''
+        officeForm.office_acc = ''
     }
 }, { immediate: true })
 
@@ -70,6 +69,4 @@ watch(() => props.isSettingsAddDialogOpen, (isOpen) => {
     }
 })
 
-onMounted(() => {
-})
 </script>

@@ -6,7 +6,7 @@
     <Dialog :open="props.isSettingsAddDialogOpen" @update:open="(val) => emit('update:isSettingsAddDialogOpen', val)">
         <DialogContent class="bg-dialogbg border border-drawerborder text-textsecondary">
             <DialogHeader>
-                <DialogTitle>Add</DialogTitle>
+                <DialogTitle>{{(dialogTitle.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()))}}</DialogTitle>
             </DialogHeader>
             <div v-if="settingsType === 'plantilla'">
                 <form @submit.prevent="handlePlantillaFormSubmit">
@@ -42,6 +42,10 @@ const {allEmployees, fetchAllEmployees} = useEmployees()
 const props = defineProps({
     isSettingsAddDialogOpen: Boolean,
     settingsType: String,
+    mode: {
+        type: String,
+        default: null,
+    },
     plantillaToEdit: {
         type: Object,
         default: null,
@@ -125,6 +129,14 @@ watch(() => props.plantillaToEdit, (newVal) => {
         plantillaForm.employee_id = ''
     }
 }, { immediate: true })
+
+const dialogTitle = ref('add')
+
+watch(() => props.mode, (newVal) => {
+    if(newVal) {
+        dialogTitle.value = newVal
+    }
+})
 
 onMounted(() => {
     fetchPositions()

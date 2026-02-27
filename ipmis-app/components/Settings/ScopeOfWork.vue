@@ -6,7 +6,7 @@
     <Dialog :open="props.isSettingsAddDialogOpen" @update:open="(val) => emit('update:isSettingsAddDialogOpen', val)">
         <DialogContent class="bg-dialogbg border border-drawerborder text-textsecondary">
             <DialogHeader>
-                <DialogTitle>Add</DialogTitle>
+                <DialogTitle>{{(dialogTitle.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()))}}</DialogTitle>
             </DialogHeader>
             <div v-if="settingsType === 'scopeOfWork'">
                 <form @submit.prevent="handleScopeOfWorkFormSubmit">
@@ -30,6 +30,10 @@ const { errorBag } = useAuth()
 const props = defineProps({
     isSettingsAddDialogOpen: Boolean,
     settingsType: String,
+    mode: {
+        type: String,
+        default: 'add',
+    },
     scopeOfWorkToEdit: {
         type: Object,
         default: null,
@@ -77,5 +81,13 @@ watch(() => props.scopeOfWorkToEdit, (newVal) => {
         scopeOfWorkForm.scope = ''
     }
 }, { immediate: true })
+
+const dialogTitle = ref('add')
+
+watch(() => props.mode, (newVal) => {
+    if (newVal) {
+        dialogTitle.value = newVal
+    }
+})
 
 </script>

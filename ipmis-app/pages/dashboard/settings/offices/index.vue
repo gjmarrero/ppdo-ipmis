@@ -5,8 +5,11 @@
             <Toaster />
         </ClientOnly>
         <div class="flex min-h-screen w-full flex-col px-2 py-2">
-            <SettingsAdd v-model:isSettingsAddDialogOpen="isSettingsAddDialogOpen" :settingsType="settingsType"
-                :officeToEdit="selectedOffice" @settingAdded="handleSettingAddition" />
+            <div class="flex flex-row justify-end">
+                <Button @click="openDialog" variant="newprimary" class="w-40">Add</Button>
+            </div>
+            <SettingsOffice v-model:isSettingsAddDialogOpen="isSettingsAddDialogOpen" :settingsType="settingsType"
+                :officeToEdit="selectedOffice" @settingAdded="handleSettingAddition" :mode="mode" />
             <DataTable :columns="columns" :data="offices" :key="tableKey" />
         </div>
     </div>
@@ -18,10 +21,9 @@ import { getColumns } from './columns';
 import { toast, Toaster } from '@/components/ui/toast';
 
 const { api } = useAxios()
+const { offices, fetchOffices } = useOffices()
 
 const tableKey = ref(0)
-
-const settingsType = ref('office')
 
 const handleView = (office) => {
     console.log('View clicked: ', office)
@@ -35,6 +37,11 @@ const handleDelete = async (office) => {
     fetchOffices()
 }
 
+const openDialog = () => {
+    selectedOffice.value = null
+    isSettingsAddDialogOpen.value = true
+}
+
 const selectedOffice = ref(null)
 
 const handleEdit = async (office) => {
@@ -44,14 +51,7 @@ const handleEdit = async (office) => {
 
 const columns = getColumns(handleView, handleDelete, handleEdit)
 
-const offices = ref([])
-
 const isSettingsAddDialogOpen = ref(false)
-
-const fetchOffices = async () => {
-    const response = await api.get('/api/offices')
-    offices.value = response.data.data
-}
 
 const handleSettingAddition = (updatedOffice) => {
     const index = offices.value.findIndex(o => o.id === updatedOffice.id)
@@ -66,9 +66,11 @@ const handleSettingAddition = (updatedOffice) => {
     toast({
         description: index !== -1 ? 'Successfully updated' : 'Successfully added'
     })
+    fetchOffices()
 }
 
 onMounted(() => {
     fetchOffices()
+    console.log("Offices", offices)
 })
 </script>

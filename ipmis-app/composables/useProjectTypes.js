@@ -3,7 +3,6 @@ export function useProjectTypes() {
     const projectTypes = ref([])
     const error = ref(null)
     const isSubmitting = ref(false)
-
     const projectTypeForm = reactive({
         project_type: '',
         project_type_code: '',
@@ -48,7 +47,9 @@ export function useProjectTypes() {
         projectTypes,
         fetchProjectTypes,
         projectTypeForm,
+        resetForm,
         submitProjectTypeForm,
-        error
+        error,
+        isSubmitting
     }
 }

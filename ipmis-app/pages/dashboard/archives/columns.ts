@@ -16,15 +16,15 @@ import {
 } from '@/components/ui/alert-dialog'
 
 export const getColumns = (onView: (archive: Archive) => void, onDelete: (archive: Archive) => void, onEdit: (archive: Archive) => void): ColumnDef<Archive>[] => [
-    {
-        accessorKey: 'id',
-        header: ({ column }) =>
-            h(Button, {
-                variant: 'ghost',
-                onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-            }, () => ['id', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]),
-        cell: ({ row }) => h('div', { class: 'propercase' }, row.getValue('id')),
-    },
+    // {
+    //     accessorKey: 'id',
+    //     header: ({ column }) =>
+    //         h(Button, {
+    //             variant: 'ghost',
+    //             onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+    //         }, () => ['id', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]),
+    //     cell: ({ row }) => h('div', { class: 'propercase' }, row.getValue('id')),
+    // },
     {
         accessorKey: 'doc_type',
         header: ({ column }) =>
@@ -60,7 +60,7 @@ export const getColumns = (onView: (archive: Archive) => void, onDelete: (archiv
 
             return h('div', { class: 'flex items-center gap-2' }, [
                 h(Button, {
-                    variant: 'outline',
+                    variant: 'newprimary',
                     class: 'flex items-center gap-2',
                     onClick: () => onView(archive),
                 }, {

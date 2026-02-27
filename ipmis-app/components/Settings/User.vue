@@ -5,7 +5,7 @@
     <Dialog :open="props.isSettingsAddDialogOpen" @update:open="(val) => emit('update:isSettingsAddDialogOpen', val)">
         <DialogContent class="bg-dialogbg border border-drawerborder text-textsecondary">
             <DialogHeader>
-                <DialogTitle>Add</DialogTitle>
+                <DialogTitle>{{(dialogTitle.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()))}}</DialogTitle>
             </DialogHeader>
             <div v-if="settingsType === 'user'">
                 <form @submit.prevent="handleUserFormSubmit">
@@ -51,6 +51,10 @@ const { errorBag } = useAuth()
 const props = defineProps({
     isSettingsAddDialogOpen: Boolean,
     settingsType: String,
+    mode: {
+        type: String,
+        default: null,
+    },
     userToEdit: {
         type: Object,
         default: null,
@@ -88,7 +92,6 @@ const roleOptions = [
 const loading = ref(false)
 
 const handleUserFormSubmit = async () => {
-    console.log("Form", userForm)
     loading.value = true
     try {
         let response
@@ -115,22 +118,35 @@ const fetchEmployees = async () => {
 }
 
 const default_employee = ref(null)
+const default_role = ref(null)
 
 watch(() => props.userToEdit, (newVal) => {
-    console.log("For edit", newVal)
     if (newVal) {
-        userForm.email = newVal.email
-
         const selected = employees.value.find(employee => employee.id === newVal.employee_id)
         if (selected) {
-            default_employee.value = selected
+            default_employee.value = selected.id
         }
-        userForm.employee_id = selected
+
+        const selectedRole = roleOptions.find(role => role.id === newVal.role)
+        if (selectedRole) {
+            default_role.value = selectedRole.id
+        }
+        userForm.employee_id = default_employee.value
         userForm.name = newVal.name
+        userForm.email = newVal.email
         userForm.password = ''
         userForm.password_confirmation = ''
+        userForm.role = default_role.value
     }
 }, { immediate: true })
+
+const dialogTitle = ref('add')
+
+watch(() => props.mode, (newVal) => {
+    if (newVal) {
+        dialogTitle.value = newVal
+    }
+})
 
 onMounted(() => {
     fetchEmployees()

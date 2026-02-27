@@ -6,7 +6,7 @@
     <Dialog :open="props.isSettingsAddDialogOpen" @update:open="(val) => emit('update:isSettingsAddDialogOpen', val)">
         <DialogContent class="bg-dialogbg border border-drawerborder text-textsecondary">
             <DialogHeader>
-                <DialogTitle>Add</DialogTitle>
+                <DialogTitle>{{(dialogTitle.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()))}}</DialogTitle>
             </DialogHeader>
             <div v-if="settingsType === 'office'">
                 <form @submit.prevent="handleOfficeFormSubmit">
@@ -77,6 +77,10 @@ const { errorBag } = useAuth()
 const props = defineProps({
     isSettingsAddDialogOpen: Boolean,
     settingsType: String,
+    mode: {
+        type: String,
+        default: 'add',
+    },
     officeToEdit: {
         type: Object,
         default: null,
@@ -141,7 +145,6 @@ const handleOfficeFormSubmit = async () => {
 }
 
 const handleUserFormSubmit = async () => {
-    console.log("Form", userForm)
     loading.value = true
     try {
         let response
@@ -172,7 +175,6 @@ const offices = ref([])
 const fetchOffices = async () => {
     const response = await api.get('/api/fetchOffices')
     offices.value = response.data
-    console.log("Offices", offices.value)
 }
 
 watch(() => props.officeToEdit, (newVal) => {
@@ -202,9 +204,17 @@ watch(() => props.userToEdit, (newVal) => {
         userForm.password_confirmation = ''
     }
 }, { immediate: true })
+
+const dialogTitle = ref('add')
+
+watch(() => props.mode, (newVal) => {
+    if(newVal) {
+        dialogTitle.value = newVal
+    }
+})
+
 onMounted(() => {
     fetchEmployees()
     fetchOffices()
-    console.log("Settings Type:", props.settingsType)
 })
 </script>

@@ -6,7 +6,7 @@
         </ClientOnly>
         <div class="flex min-h-screen w-full flex-col px-2 py-2">
             <SettingsEmployee v-model:isSettingsAddDialogOpen="isSettingsAddDialogOpen" :settingsType="settingsType"
-                :employeeToEdit="selectedEmployee" @settingAdded="handleSettingAddition" />
+                :employeeToEdit="selectedEmployee" @settingAdded="handleSettingAddition" :mode="mode" />
             <DataTable :columns="columns" :data="allEmployees" :key="tableKey" />
         </div>
     </div>
@@ -38,8 +38,11 @@ const handleDelete = async (employee) => {
 
 const selectedEmployee = ref(null)
 
+const mode = ref('add')
+
 const handleEdit = async (employee) => {
     selectedEmployee.value = employee
+    mode.value = 'edit'
     isSettingsAddDialogOpen.value = true
 }
 

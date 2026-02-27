@@ -17,15 +17,15 @@ import {
 } from '@/components/ui/alert-dialog'
 
 export const getColumns = (onView: (employee: Employee) => void, onDelete: (employee: Employee) => void, onEdit: (employee: Employee) => void): ColumnDef<Employee>[] => [
-    {
-        accessorKey: 'id',
-        header: ({ column }) =>
-            h(Button, {
-                variant: 'ghost',
-                onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-            }, () => ['Id', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]),
-        cell: ({ row }) => h('div', { class: 'propercase' }, row.getValue('id')),
-    },
+    // {
+    //     accessorKey: 'id',
+    //     header: ({ column }) =>
+    //         h(Button, {
+    //             variant: 'ghost',
+    //             onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+    //         }, () => ['Id', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]),
+    //     cell: ({ row }) => h('div', { class: 'propercase' }, row.getValue('id')),
+    // },
     {
         accessorKey: 'last_name',
         header: ({ column }) =>

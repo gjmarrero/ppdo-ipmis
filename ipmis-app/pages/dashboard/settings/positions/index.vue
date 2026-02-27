@@ -6,7 +6,7 @@
         </ClientOnly>
         <div class="flex min-h-screen w-full flex-col px-2 py-2">
             <SettingsPosition v-model:isSettingsAddDialogOpen="isSettingsAddDialogOpen" :settingsType="settingsType"
-                :positionToEdit="selectedPosition" @settingAdded="handleSettingAddition" />
+                :positionToEdit="selectedPosition" @settingAdded="handleSettingAddition" :mode="mode"/>
             <DataTable :columns="columns" :data="positions" :key="tableKey" />
         </div>
     </div>
@@ -37,8 +37,11 @@ const handleDelete = async (position) => {
 
 const selectedPosition = ref(null)
 
+const mode = ref('add')
+
 const handleEdit = async (position) => {
     selectedPosition.value = position
+    mode.value = 'edit'
     isSettingsAddDialogOpen.value = true
 }
 

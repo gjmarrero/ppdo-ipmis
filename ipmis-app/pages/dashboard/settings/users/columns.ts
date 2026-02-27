@@ -4,16 +4,16 @@ import { ArrowUpDown, Eye, PenLine, Trash } from 'lucide-vue-next'
 import { h } from 'vue'
 import Button from '~/components/ui/button/Button.vue'
 
-export const getColumns = (onView: (user: User) => void, onDelete:(user: User) => void, onEdit: (user: User) => void): ColumnDef<User>[] => [
-    {
-        accessorKey: 'id',
-        header: ({ column }) =>
-            h(Button, {
-                variant: 'ghost',
-                onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-            }, () => ['id', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]),
-        cell: ({ row }) => h('div', { class: 'propercase' }, row.getValue('id')),
-    },
+export const getColumns = (onView: (user: User) => void, onDelete: (user: User) => void, onEdit: (user: User) => void): ColumnDef<User>[] => [
+    // {
+    //     accessorKey: 'id',
+    //     header: ({ column }) =>
+    //         h(Button, {
+    //             variant: 'ghost',
+    //             onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+    //         }, () => ['id', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]),
+    //     cell: ({ row }) => h('div', { class: 'propercase' }, row.getValue('id')),
+    // },
     {
         accessorKey: 'name',
         header: ({ column }) =>
@@ -55,16 +55,7 @@ export const getColumns = (onView: (user: User) => void, onDelete:(user: User) =
                 //         '',
                 //     ],
                 // }),
-                h(Button, {
-                    variant: 'newsecondary',
-                    class: 'flex items-center gap-2 text-red-600',
-                    onClick: () => onDelete(user),
-                }, {
-                    default: () => [
-                        h(Trash, { class: 'w-4 h-4' }),
-                        '',
-                    ],
-                }),
+
                 h(Button, {
                     variant: 'newsecondary',
                     class: 'flex items-center gap-2',
@@ -72,6 +63,16 @@ export const getColumns = (onView: (user: User) => void, onDelete:(user: User) =
                 }, {
                     default: () => [
                         h(PenLine, { class: 'w-4 h-4' }),
+                        '',
+                    ],
+                }),
+                h(Button, {
+                    variant: 'newsecondary',
+                    class: 'flex items-center gap-2 text-red-600',
+                    onClick: () => onDelete(user),
+                }, {
+                    default: () => [
+                        h(Trash, { class: 'w-4 h-4' }),
                         '',
                     ],
                 }),
