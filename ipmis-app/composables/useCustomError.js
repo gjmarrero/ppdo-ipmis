@@ -7,6 +7,8 @@ export default function useCustomError(){
                 for(let key in response.data.errors){
                     errorBag.value[key] = response.data.errors[key][0]
                 }
+            } else if(response.data.message){
+                errorBag.value.general = response.data.message
             }
         }
     }

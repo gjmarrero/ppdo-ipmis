@@ -48,6 +48,11 @@ class Implementation extends Model
         return $this->hasMany(ImplementationOrder::class);
     }
 
+    public function inspections(): HasMany
+    {
+        return $this->hasMany(ImplementationInspection::class);
+    }
+
     // protected $casts = [
     //     'date_start' => 'date:Y-m-d',
     // ];

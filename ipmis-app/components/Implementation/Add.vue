@@ -25,8 +25,8 @@
                     <FormGroup placeholder="Date Start" v-model="implementationForm.date_start"
                         :errorMessage="errorBag.date_start" name="date_start" label="Date Start" type="date" />
                 </div>
-                <div class="mt-10">
-                    <Button type="submit" variant="primary">Submit Data</Button>
+                <div class="flex flex-row mt-10 justify-end">
+                    <Button type="submit" variant="newprimary">Submit Data</Button>
                 </div>
             </form>
         </RightDrawer>
@@ -34,7 +34,6 @@
 </template>
 
 <script setup>
-import Button from '../Button.vue'
 
 const { implementationForm, resetForm, submitImplementation } = useImplementations()
 const { errorBag } = useCustomError()
@@ -92,7 +91,7 @@ watch(
 
 onMounted(() => {
     fetchEmployees()
-    console.log(props.mode, props.implementation)
+    console.log("Selected project:", props.implementation)
 })
 </script>
 

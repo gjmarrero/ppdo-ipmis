@@ -12,7 +12,7 @@
                         :errorMessage="errorBag.date_prepared" name="date_prepared" label="CMR Date Prepared"
                         type="date" />
                     <FormGroup placeholder="Date Submitted" v-model="cmrForm.date_submitted"
-                        :errorMessage="errorBag.date_issued" name="date_submitted" label="CMR Date Submitted"
+                        :errorMessage="errorBag.date_submitted" name="date_submitted" label="CMR Date Submitted"
                         type="date" />
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-1 gap-2 flex-grow mb-8">
@@ -68,11 +68,9 @@
 </template>
 
 <script setup>
-
-const { api } = useAxios()
 const { cmrForm, cmr_files, cmrFileInput, submitCmr, isSubmittingCmr } = useEnvironmentalClearances()
 const { employees, fetchEmployees } = useEmployees()
-const { errorBag, transformValidationErrors, resetErrorBag } = useCustomError()
+const { errorBag } = useCustomError()
 
 const props = defineProps({
     mode: {

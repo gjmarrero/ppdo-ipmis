@@ -14,7 +14,7 @@
             </div>
             <div class="mb-8">
                 <FormGroup placeholder="Project Title" v-model="fundedProjectForm.title" :errorMessage="errorBag.title"
-                    name="project_title" label="Title" @blur="checkDuplicateTitle" />
+                    name="project_title" label="Title" @blur="checkDuplicateFields" />
 
                 <p v-if="titleExists" class="text-red-500 text-sm mt-1">
                     {{ titleMessage }}
@@ -36,16 +36,14 @@
                     <Switch v-model="hasSupplementalBudget" />
                 </div>
                 <FormGroup placeholder="SB Number(if applicable)" v-model="fundedProjectForm.sb_number"
-                    :errorMessage="errorBag.sb_number" name="sb_number" label="SB Number" />
+                    :errorMessage="errorBag.sb_number" name="sb_number" label="SB Number" @blur="setDefaultSbNumber" />
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-2 flex-grow mb-8">
                 <div>
                     <FormLabel>Fund Source</FormLabel>
                     <FormCombobox :options="fundSources" placeholder="Select fund source"
-                        v-model="fundedProjectForm.fundsource_id" />
+                        v-model="fundedProjectForm.fundsource_id" :errorMessage="errorBag.fundsource_id" />
                 </div>
-                <!-- <FormGroup placeholder="Project Cost" v-model="fundedProjectForm.approved_cost"
-                    :errorMessage="errorBag.approved_cost" name="approved_cost" label="Cost" /> -->
 
                 <CleaveInput v-model="fundedProjectForm.approved_cost" label="Approved Cost" labelFor="approved_cost"
                     name="approved_cost" placeholder="Approved Cost" :errorMessage="errorBag.approved_cost"
@@ -56,14 +54,18 @@
                 <div>
                     <FormLabel class="mb-2">Project Number</FormLabel>
                     <FormPrefixInput :prefix="`${fundedProjectForm.year_funded || '0000'}-${pn_prefix}`"
-                        v-model="fundedProjectForm.number" @blur="setRefNumber" />
+                        v-model="fundedProjectForm.number" @blur="handleProjectNumberBlur" :errorMessage="errorBag.number" />
+                    <p v-if="numberExists" class="text-red-500 text-sm mt-1">
+                        {{ numberMessage }}
+                    </p>
                 </div>
 
                 <div>
                     <FormLabel class="mb-2">Reference Number</FormLabel>
                     <FormPrefixInput
                         :prefix="`${fundsource_code || '0'}${fundedProjectForm.sb_number || '0'}-${fundedProjectForm.year_funded || '0000'}${isAdmin ? '-ADMIN' : ''}`"
-                        v-model="fundedProjectForm.reference_number" readonly />
+                        v-model="fundedProjectForm.reference_number" readonly
+                        :errorMessage="errorBag.reference_number" />
 
                 </div>
 
@@ -97,7 +99,7 @@
             </div>
 
             <div class="flex flex-row justify-end">
-                <Button type="submit" variant="newprimary" size="lg" :disabled="titleExists || isSubmitting">
+                <Button type="submit" variant="newprimary" size="lg" :disabled="titleExists || numberExists || isSubmitting">
                     <Spinner v-if="isSubmitting" :show="true" size="lg" label="Saving..." />
                     <span v-else>Submit</span>
                 </Button>
@@ -128,6 +130,12 @@ const props = defineProps({
 const emit = defineEmits(['update:isFundedProjectDrawerOpen', 'add', 'form-submitted'])
 
 const isDrawerOpen = ref(false)
+const currentFundedId = computed(() =>
+    props.fundedProject?.latest_funding?.id
+    || props.fundedProject?.latest_funding_id
+    || props.fundedProject?.funded_project_id
+    || null
+)
 
 watch(() => props.isFundedProjectDrawerOpen, (val) => {
     isDrawerOpen.value = val
@@ -139,11 +147,17 @@ watch(isDrawerOpen, (val) => {
 
 const titleExists = ref(false)
 const titleMessage = ref('')
+const numberExists = ref(false)
+const numberMessage = ref('')
+const originalTitle = ref('')
+const originalNumber = ref('')
 
-const checkDuplicateTitle = async () => {
-    if (!fundedProjectForm.title) {
+const checkDuplicateFields = async () => {
+    if (!fundedProjectForm.title && !fundedProjectForm.number) {
         titleExists.value = false
         titleMessage.value = ''
+        numberExists.value = false
+        numberMessage.value = ''
         return
     }
 
@@ -151,15 +165,29 @@ const checkDuplicateTitle = async () => {
         const { data } = await api.get('/api/funded_projects/check_title', {
             params: {
                 title: fundedProjectForm.title,
+                number: fundedProjectForm.number,
                 ignore_id: props.mode === 'edit'
                     ? props.fundedProject?.id
+                    : null,
+                ignore_funded_id: props.mode === 'edit'
+                    ? currentFundedId.value
                     : null
             }
         })
 
-        titleExists.value = data.exists
-        titleMessage.value = data.exists
+        titleExists.value = data.title_exists ?? data.exists
+        if (props.mode === 'edit' && fundedProjectForm.title === originalTitle.value) {
+            titleExists.value = false
+        }
+        titleMessage.value = titleExists.value
             ? 'Project title already exists.'
+            : ''
+        numberExists.value = data.number_exists ?? false
+        if (props.mode === 'edit' && fundedProjectForm.number === originalNumber.value) {
+            numberExists.value = false
+        }
+        numberMessage.value = numberExists.value
+            ? 'Project number already exists.'
             : ''
 
     } catch (err) {
@@ -187,7 +215,11 @@ const barangays = ref([])
 
 function fetchBarangaysByMunicipality(municipalityId) {
     api.get(`/api/municipalities/${municipalityId}/barangays`).then(({ data }) => {
-        barangays.value = data
+        barangays.value = [...data].sort((a, b) => {
+            const aName = (a.name ?? a.barangay ?? '').toString()
+            const bName = (b.name ?? b.barangay ?? '').toString()
+            return aName.localeCompare(bName, undefined, { sensitivity: 'base' })
+        })
     })
 }
 
@@ -210,11 +242,10 @@ watch(
     { deep: true }
 )
 const handleSubmit = async () => {
-    console.log("Props", props?.fundedProject)
     await submitFundedProject({
         mode: props?.mode,
         projectId: props?.fundedProject?.id || '',
-        fundedProjectId: props?.fundedProject?.latest_funding?.id || '', 
+        fundedProjectId: currentFundedId.value || '',
         onSuccess: () => {
             emit('form-submitted', props.mode)
             resetForm()
@@ -253,6 +284,7 @@ watch(
 
 const fundsource_code = ref()
 const fundsource_abbrev = ref()
+const isHydratingEdit = ref(false)
 watch(
     () => fundedProjectForm.fundsource_id,
     (newVal) => {
@@ -266,12 +298,13 @@ watch(
     }
 )
 const prefix = () => {
-    return `${fundsource_code.value ? fundsource_code.value : 0}${hasSupplementalBudget.value ? 1 : 0}`
+    return `${fundsource_code.value || ''}${hasSupplementalBudget.value ? 1 : 0}`
 }
 
 watch(
     [fundsource_code, hasSupplementalBudget, isAdmin],
     ([newCode, newSupp, newAdmin]) => {
+        if (isHydratingEdit.value) return
         if (!newCode) return
 
         let current = fundedProjectForm.reference_number || ""
@@ -296,6 +329,12 @@ const pn_prefix = computed(() => {
     return prefix
 })
 
+const setDefaultSbNumber = () => {
+    if (!fundedProjectForm.sb_number) {
+        fundedProjectForm.sb_number = '0'
+    }
+}
+
 const setRefNumber = async () => {
     // ⏳ Wait until FormPrefixInput finishes emitting and parent v-model updates
     await nextTick()
@@ -317,6 +356,11 @@ const setRefNumber = async () => {
     fundedProjectForm.reference_number = userPart
 }
 
+const handleProjectNumberBlur = async () => {
+    await setRefNumber()
+    await checkDuplicateFields()
+}
+
 
 watch(
     [
@@ -325,6 +369,7 @@ watch(
         () => fundedProjectForm.sb_number
     ],
     ([newYear, newAbbrev, newSB]) => {
+        if (isHydratingEdit.value) return
         if (!newYear || !newAbbrev) return
 
         const current = fundedProjectForm.number || ''
@@ -339,6 +384,8 @@ watch(
     () => props.mode,
     async (mode) => {
         if (mode === 'edit' && props.fundedProject) {
+            isHydratingEdit.value = true
+            await fetchFundSources()
             console.log("Project to edit: ", props.fundedProject)
             Object.assign(fundedProjectForm, {
                 title: props.fundedProject.title || '',
@@ -346,14 +393,27 @@ watch(
                 reference_number: props.fundedProject.latest_funding.reference_number,
                 fundsource_id: props.fundedProject.latest_funding.fundsource_id || '',
                 year_funded: props.fundedProject.latest_funding.year_funded || '',
+                has_supplemental_budget: props.fundedProject.latest_funding.has_supplemental_budget ? 1 : 0,
                 sb_number: props.fundedProject.latest_funding.sb_number || '',
+                is_admin: props.fundedProject.latest_funding.is_admin ? 1 : 0,
                 approved_cost: props.fundedProject.latest_funding.approved_cost || '',
                 locations: props.fundedProject.locations_array || [
                     { municipality_id: '', barangay_id: '', sitio: '' }
                 ]
             })
+            originalTitle.value = fundedProjectForm.title || ''
+            originalNumber.value = fundedProjectForm.number || ''
+            const fund = fundSources.value.find(f => f.id === fundedProjectForm.fundsource_id)
+            fundsource_code.value = fund ? fund.fundsource_code : ''
+            fundsource_abbrev.value = fund ? fund.fundsource_abbrev : ''
+            await nextTick()
+            isHydratingEdit.value = false
         } else if (mode === 'add') {
+            isHydratingEdit.value = false
             resetForm()
+            setDefaultSbNumber()
+            originalTitle.value = ''
+            originalNumber.value = ''
         }
     },
     { immediate: true }

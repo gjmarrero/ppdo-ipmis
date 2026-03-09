@@ -17,4 +17,9 @@ class ImplementationOrder extends Model
     {
         return $this->belongsTo(Implementation::class);
     }
+
+    public function files()
+    {
+        return $this->hasMany(ImplementationOrderFile::class,'implementation_order_id', 'id');
+    }
 }

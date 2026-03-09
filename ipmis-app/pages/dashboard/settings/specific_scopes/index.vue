@@ -5,8 +5,10 @@
             <Toaster />
         </ClientOnly>
         <div class="flex min-h-screen w-full flex-col px-2 py-2">
-            <SettingsScopeOfWork v-model:isSettingsAddDialogOpen="isSettingsAddDialogOpen" :settingsType="settingsType"
-                :scopeOfWorkToEdit="selectedScopeOfWork" @settingAdded="handleSettingAddition" :mode="mode"/>
+            <div class="flex flex-row justify-end">
+                <Button @click="openDialog" variant="newprimary" class="w-40">Add</Button>
+            </div>
+            <SettingsScopeOfWork v-model:isSettingsAddDialogOpen="isSettingsAddDialogOpen" :scopeOfWorkToEdit="selectedScopeOfWork" @settingAdded="handleSettingAddition" />
             <DataTable :columns="columns" :data="scopes_of_work" :key="tableKey" />
         </div>
     </div>
@@ -14,14 +16,13 @@
 </template>
 
 <script setup>
-import { getColumns } from './columns';
-import { toast, Toaster } from '@/components/ui/toast';
+import { getColumns } from './columns'
+import { toast, Toaster } from '@/components/ui/toast'
 
 const { api } = useAxios()
+const { scopes_of_work, fetchScopesOfWork } = useSpecificScopeOfWorks()
 
 const tableKey = ref(0)
-
-const settingsType = ref('scopeOfWork')
 
 const handleView = (scopeOfWork) => {
     console.log('View clicked: ', scopeOfWork)
@@ -37,27 +38,24 @@ const handleDelete = async (scopeOfWork) => {
 
 const selectedScopeOfWork = ref(null)
 
-const mode = ref('add')
-
 const handleEdit = async (scopeOfWork) => {
     selectedScopeOfWork.value = scopeOfWork
-    mode.value = 'edit'
+    isSettingsAddDialogOpen.value = true
+}
+
+const openDialog = () => {
+    selectedScopeOfWork.value = null
     isSettingsAddDialogOpen.value = true
 }
 
 const columns = getColumns(handleView, handleDelete, handleEdit)
 
-const scopes_of_work = ref([])
-
 const isSettingsAddDialogOpen = ref(false)
 
-const fetchScopesOfWork = async () => {
-    const response = await api.get('/api/scopes_of_work')
-    scopes_of_work.value = response.data.data
-}
+const handleSettingAddition = (response) => {
+    if(!response) return
 
-const handleSettingAddition = (updatedScopeOfWork) => {
-    console.log("Updated scope of work", updatedScopeOfWork)
+    const updatedScopeOfWork = response.data.data
     const index = scopes_of_work.value.findIndex(o => o.id === updatedScopeOfWork.id)
     if (index !== -1) {
         scopes_of_work.value.splice(index, 1, updatedScopeOfWork)

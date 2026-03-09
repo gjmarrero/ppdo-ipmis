@@ -41,7 +41,7 @@
 </template>
 
 <script setup>
-const { errorBag, transformValidationErrors, resetErrorBag } = useCustomError()
+const { errorBag } = useCustomError()
 const { employees, fetchEmployees } = useEmployees()
 const { qualityControlForm, submitQualityControl, resetQualityControlForm, isSubmittingQcp } = usePreEngineerings()
 

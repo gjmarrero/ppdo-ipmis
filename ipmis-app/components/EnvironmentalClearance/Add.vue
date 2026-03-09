@@ -33,7 +33,7 @@
                     <div>
                         <FormLabel>Employee In-Charge</FormLabel>
                         <FormCombobox :options="employees" placeholder="Select Employee"
-                            v-model="environmentalClearanceForm.employee_id" />
+                            v-model="environmentalClearanceForm.employee_id" :errorMessage="errorBag.employee_id" />
                     </div>
 
                 </div>
@@ -105,7 +105,7 @@ import Switch from '../ui/switch/Switch.vue'
 const { api } = useAxios()
 const { environmentalClearanceForm, files, fileInput, isTransmitted, submitEnvironmentalClearance, resetForm, isSubmitting } = useEnvironmentalClearances()
 const { employees, fetchEmployees } = useEmployees()
-const { errorBag, transformValidationErrors, resetErrorBag } = useCustomError()
+const { errorBag } = useCustomError()
 
 const props = defineProps({
     mode: {

@@ -23,7 +23,8 @@ class ImplementationResource extends JsonResource
             'user_id' => $this->user->name,
             'implementation_document_status' => $this->implementation_document_status,
             'monthly_schedule_accomplishment' => $this->implementation_monthly_accomplishments,
-            'implementation_orders' => $this->orders
+            'implementation_orders' => $this->orders,
+            'implementation_inspections' => $this->inspections,
         ];
     }
 }

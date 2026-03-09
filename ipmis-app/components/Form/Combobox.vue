@@ -19,6 +19,10 @@
     <p v-if="isOpen && !filteredOptions.length" class="p-2 text-gray-500">
       No results found.
     </p>
+
+    <p v-if="errorMessage" class="text-red-600 mt-1">
+      {{ errorMessage }}
+    </p>
   </div>
 </template>
 
@@ -42,6 +46,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  errorMessage: {
+        type: String,
+        default: '',
+    },
 })
 
 const emit = defineEmits(['update:modelValue'])

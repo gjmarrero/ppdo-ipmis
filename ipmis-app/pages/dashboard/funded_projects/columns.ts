@@ -39,7 +39,7 @@ export const getProjectColumns = ({
                 return h(Button, {
                     variant: 'ghost',
                     onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-                }, () => ['Number', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
+                }, () => ['Project Number', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
             },
             cell: ({ row }) => h('div', { class: 'propercase' }, row.getValue('number')),
             meta: {

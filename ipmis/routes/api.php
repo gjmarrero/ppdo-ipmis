@@ -13,6 +13,7 @@ use App\Http\Controllers\EnvironmentalClearanceController;
 use App\Http\Controllers\FundedProjectController;
 use App\Http\Controllers\FundsourceController;
 use App\Http\Controllers\ImplementationController;
+use App\Http\Controllers\ImplementationInspectionController;
 use App\Http\Controllers\ImplementationMonthlyAccomplishmentController;
 use App\Http\Controllers\ImplementationOrderController;
 use App\Http\Controllers\OdsuController;
@@ -40,6 +41,7 @@ use App\Models\ECCertificateType;
 use App\Models\ECPambType;
 use App\Models\Employee;
 use App\Models\Fundsource;
+use App\Models\ImplementationMonthlyAccomplishment;
 use App\Models\ImplementationOrder;
 use App\Models\Municipality;
 use App\Models\Odsu;
@@ -81,9 +83,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/users', [UserController::class, 'index']);
     Route::post('/user', [UserController::class, 'store']);
+    Route::put('/user/{user}', [UserController::class, 'update']);
     Route::put('/user/account', [UserController::class, 'updateAccount']);
     Route::put('/user/password', [UserController::class, 'updatePassword']);
-    
+
 
     Route::get('/odsus', [OdsuController::class, 'index']);
     Route::post('/odsu', [OdsuController::class, 'store']);
@@ -132,8 +135,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/pre_engineerings', [PreengineeringStatusController::class, 'index']);
     Route::post('/preengineering', [PreengineeringStatusController::class, 'store']);
     Route::put('/preengineering/{preengineering}', [PreengineeringStatusController::class, 'update']);
-    Route::post('/preengineering/qcp_status/{preEngineeringId}', [PreengineeringStatusController::class,'update_qcp_status']);
-    Route::post( '/preengineering/review/{preEngineeringId}', [PreengineeringStatusController::class, 'update_review_status']);
+    Route::post('/preengineering/qcp_status/{preEngineeringId}', [PreengineeringStatusController::class, 'update_qcp_status']);
+    Route::post('/preengineering/review/{preEngineeringId}', [PreengineeringStatusController::class, 'update_review_status']);
 
     Route::get('/fetch_preengineering_activities/{preengineering_id}', [PreengineeringActivityController::class, 'fetch_preengineering_activities']);
     Route::post('/preengineering_activity', [PreengineeringActivityController::class, 'store']);
@@ -154,7 +157,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/environmental_clearance/{environmental_clearance}', [EnvironmentalClearanceController::class, 'update']);
     Route::put('/update_other_requirements', [EnvironmentalClearanceController::class, 'updateOtherRequirement']);
     Route::post('/environmental_clearance/cmr/{environmentalClearanceId}', [EnvironmentalClearanceCmrController::class, 'store']);
-    Route::put('/environmental_clearance/update_cmr/{environmentalClearanceCmrId}', [EnvironmentalClearanceCmrController::class, 'update']);    
+    Route::put('/environmental_clearance/update_cmr/{environmentalClearanceCmrId}', [EnvironmentalClearanceCmrController::class, 'update']);
 
     Route::get('/implementations', [ImplementationController::class, 'index']);
     Route::post('/implementation', [ImplementationController::class, 'store']);
@@ -162,9 +165,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/implementation/monthly_targets', [ImplementationController::class, 'store_monthly_targets']);
     Route::get('/implementation/{implementation}/next_accomplishment_month', [ImplementationController::class, 'nextAccomplishmentMonth']);
     Route::get('/implementation/{implementation}/schedule/{duration}', [ImplementationController::class, 'monthlySchedule']);
+    Route::get('/implementation/{id}/expected-schedule/{duration}', [ImplementationController::class, 'getExpectedSchedule']);
+
+
     Route::post('/accomplishments/batch_update', [ImplementationMonthlyAccomplishmentController::class, 'batchUpdate']);
     Route::post('/implementation/{implementation}/order', [ImplementationOrderController::class, 'store']);
+    Route::put('/implementation/order/{implementation_order}', [ImplementationOrderController::class, 'update']);
     Route::get('implementation/{implementation}/target', [ImplementationController::class, 'monthlyTarget']);
+
+    Route::post('/implementation/{implementation}/inspection', [ImplementationInspectionController::class, 'store']);
+    Route::put('/implementation/inspection/{inspection}', [ImplementationInspectionController::class, 'update']);
 
     Route::get('/reports/projects', [ReportController::class, 'generateProjects']);
     Route::get('/pambProjects', [ReportController::class, 'pambProjects']);
@@ -195,7 +205,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         return ProjectType::all(['id', 'project_type as name', 'project_type_code']);
     });
 
-    Route::get('/fetchSpecificWorks',  function () {
+    Route::get('/fetchSpecificWorks', function () {
         return SpecificScopeOfWork::all(['id', 'scope as name']);
     });
 
@@ -279,6 +289,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
             'environmental_clearances' => '4045fd02-f4d1-46fb-a4dc-30e7d03b43bd',
             'projects' => '9693eb28-98f9-11f0-97f7-74563caf0ec2',
             'funded_projects' => '9693eb28-98f9-11f0-97f7-74563caf0ec2',
+            'implementations' => '1d7d8665-0e4f-49f1-a671-b4ad0892cf27'
         ];
 
         // If a path parameter is passed, convert it to office_id
@@ -355,5 +366,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // })
 
 });
-
 

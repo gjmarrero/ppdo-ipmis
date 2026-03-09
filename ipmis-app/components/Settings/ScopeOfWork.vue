@@ -1,39 +1,29 @@
 <template>
-    <div class="flex flex-row justify-end">
-        <Button @click="openDialog" variant="newprimary" class="w-40">Add</Button>
-    </div>
-
     <Dialog :open="props.isSettingsAddDialogOpen" @update:open="(val) => emit('update:isSettingsAddDialogOpen', val)">
         <DialogContent class="bg-dialogbg border border-drawerborder text-textsecondary">
             <DialogHeader>
-                <DialogTitle>{{(dialogTitle.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()))}}</DialogTitle>
+                <DialogTitle>{{ isEditing ? 'Edit Specific Scope of Work' : 'Add Scope of Work' }}</DialogTitle>
             </DialogHeader>
-            <div v-if="settingsType === 'scopeOfWork'">
-                <form @submit.prevent="handleScopeOfWorkFormSubmit">
-                    <FormGroup v-model="scopeOfWorkForm.scope" :errorMessage="errorBag.scope" label="Description" name="scope"
-                        type="text" required labelFor="scope" class="my-5" />
-                    <div class="flex flex-row justify-end text-textprimary">
-                        <Button type="submit" variant="newprimary" :disabled="loading">Submit</Button>
-                    </div>
-                </form>
-            </div>
+            <form @submit.prevent="handleSubmit">
+                <FormGroup v-model="scopeOfWorkForm.scope" :errorMessage="errorBag.scope" label="Description"
+                    name="scope" type="text" required labelFor="scope" class="my-5" />
+                <div class="flex flex-row justify-end text-textprimary">
+                    <Button type="submit" variant="newprimary" size="lg" :disabled="isSubmitting">
+                        <Spinner v-if="isSubmitting" :show="true" size="lg" label="Saving..." />
+                        <span v-else>Submit</span>
+                    </Button>
+                </div>
+            </form>
         </DialogContent>
     </Dialog>
 </template>
 
 <script setup>
 
-const { api } = useAxios()
-
-const { errorBag } = useAuth()
-
+const { errorBag } = useCustomError()
+const { isSubmitting, scopeOfWorkForm, submitScopeOfWorkForm, resetForm } = useSpecificScopeOfWorks()
 const props = defineProps({
     isSettingsAddDialogOpen: Boolean,
-    settingsType: String,
-    mode: {
-        type: String,
-        default: 'add',
-    },
     scopeOfWorkToEdit: {
         type: Object,
         default: null,
@@ -42,36 +32,17 @@ const props = defineProps({
 
 const emit = defineEmits(['update:isSettingsAddDialogOpen', 'settingAdded'])
 
-const openDialog = () => {
-    emit('update:isSettingsAddDialogOpen', true)
-}
+const isEditing = computed(() => !!props.scopeOfWorkToEdit)
 
-const scopeOfWorkForm = reactive({
-    'scope': '',
-})
-
-const resetForm = () => {
-    scopeOfWorkForm.scope = ''
-}
-const loading = ref(false)
-
-const handleScopeOfWorkFormSubmit = async () => {
-    loading.value = true
-    try {
-        let response
-        if (props.scopeOfWorkToEdit) {
-            response = await api.put(`/api/scope_of_work/${props.scopeOfWorkToEdit.id}`, scopeOfWorkForm)
-        } else {
-            response = await api.post('/api/scope_of_work', scopeOfWorkForm)
+const handleSubmit = async () => {
+    const data = await submitScopeOfWorkForm({
+        scopeOfWorkToEdit: props.scopeOfWorkToEdit,
+        onSuccess: () => {
+            emit('form-submitted')
+            emit('update:isSettingsAddDialogOpen', false)
         }
-        resetForm()
-        emit('update:isSettingsAddDialogOpen', false)
-        emit('settingAdded', response.data.data)
-    } catch (error) {
-        console.error('Save failed:', error)
-    } finally {
-        loading.value = false
-    }
+    })
+    emit('settingAdded', data)
 }
 
 watch(() => props.scopeOfWorkToEdit, (newVal) => {
@@ -82,11 +53,9 @@ watch(() => props.scopeOfWorkToEdit, (newVal) => {
     }
 }, { immediate: true })
 
-const dialogTitle = ref('add')
-
-watch(() => props.mode, (newVal) => {
-    if (newVal) {
-        dialogTitle.value = newVal
+watch(() => props.isSettingsAddDialogOpen, (isOpen) => {
+    if (!isOpen) {
+        resetForm()
     }
 })
 

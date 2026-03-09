@@ -1,6 +1,7 @@
 export function usePreEngineerings(filterType) {
     const { api } = useAxios()
     const { user, me } = useAuth()
+    const { resetErrorBag, transformValidationErrors } = useCustomError()
     const loading = ref(false)
     const rawPreEngineerings = ref([])
     const filteredPreEngineerings = ref([])
@@ -88,22 +89,22 @@ export function usePreEngineerings(filterType) {
             filteredPreEngineerings.value = rawPreEngineerings.value.filter(p => p.latest_funding?.latest_preengineering?.employee_id === user.value.employee_id &&
                 p.latest_funding?.latest_preengineering?.date_submitted_lce == null)
         }
-        else if(filter === 'for_pow') {
+        else if (filter === 'for_pow') {
             filteredPreEngineerings.value = rawPreEngineerings.value.filter(p => !p.latest_funding?.latest_preengineering)
         }
-        else if(filter === 'for_qcp') {
-            filteredPreEngineerings.value = rawPreEngineerings.value.filter(p =>p.latest_funding?.latest_preengineering?.date_reviewed_pow && !p.latest_funding?.latest_preengineering?.date_qcp_reviewed)
+        else if (filter === 'for_qcp') {
+            filteredPreEngineerings.value = rawPreEngineerings.value.filter(p => p.latest_funding?.latest_preengineering?.date_reviewed_pow && !p.latest_funding?.latest_preengineering?.date_qcp_reviewed)
         }
-        else if(filter === 'for_review') {
+        else if (filter === 'for_review') {
             filteredPreEngineerings.value = rawPreEngineerings.value.filter(p => p.latest_funding?.latest_preengineering?.date_reviewed_pow && p.latest_funding?.latest_preengineering?.date_qcp_reviewed && !p.latest_funding?.latest_preengineering?.date_recommended_for_approval)
         }
-        else if(filter === 'processed_pow') {
+        else if (filter === 'processed_pow') {
             filteredPreEngineerings.value = rawPreEngineerings.value.filter(p => p.latest_funding?.latest_preengineering?.date_submitted_to_lce)
         }
-        else if(filter === 'pow_assignments') {
+        else if (filter === 'pow_assignments') {
             filteredPreEngineerings.value = rawPreEngineerings.value.filter(p => p.latest_funding?.latest_preengineering?.employee_id === user.value.employee_id && !p.latest_funding?.latest_preengineering?.date_reviewed_pow)
         }
-        else if(filter === 'qcp_assignments') {
+        else if (filter === 'qcp_assignments') {
             filteredPreEngineerings.value = rawPreEngineerings.value.filter(p => p.latest_funding?.latest_preengineering?.employee_id_qcp === user.value.employee_id && p.latest_funding?.latest_preengineering?.date_reviewed_pow && !p.latest_funding?.latest_preengineering?.date_qcp_reviewed)
         }
         else {
@@ -231,6 +232,7 @@ export function usePreEngineerings(filterType) {
     }
 
     const submitPreEngineering = async ({ mode = 'add', preEngineeringId = null, fundedProjectId, onSuccess } = {}) => {
+        resetErrorBag()
         isSubmitting.value = true
         errors.value = {}
         try {
@@ -280,10 +282,10 @@ export function usePreEngineerings(filterType) {
 
             return data
         } catch (err) {
-            if (err.response?.data?.errors) {
-                errors.value = err.response.data.errors
+            if (err.response) {
+                transformValidationErrors(err.response)
             } else {
-                console.error('Unexpected error', err)
+                console.log('Unexpected error', err)
             }
             throw err
         } finally {
@@ -314,18 +316,20 @@ export function usePreEngineerings(filterType) {
 
             return data
         } catch (err) {
-            if (err.response?.data?.errors) {
-                errors.value = err.response.data.errors
+            if (err.response) {
+                transformValidationErrors(err.response)
             } else {
-                console.error('Unexpected error', err)
+                console.log('Unexpected error', err)
             }
             throw err
         } finally {
-            isSubmittingQcp.value = true
+            isSubmittingQcp.value = false
         }
     }
 
-    const submitReviewStatus = async({ preEngineeringId = null, onSuccess}) => {
+    const submitReviewStatus = async ({preEngineeringId = null, onSuccess }) => {
+        console.log("Submitting review status for PE ID:", reviewForm, preEngineeringId)
+        resetErrorBag()
         isSubmittingReview.value = true
         errors.value = {}
         try {
@@ -345,8 +349,8 @@ export function usePreEngineerings(filterType) {
 
             return data
         } catch (err) {
-            if (err.response?.data?.errors) {
-                errors.value = err.response.data.errors
+            if (err.response) {
+                transformValidationErrors(err.response)
             } else {
                 console.error('Unexpected error', err)
             }

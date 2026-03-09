@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserCreateRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -12,34 +13,36 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $users = User::all();
         return UserResource::collection($users);
     }
 
-    public function store(Request $request){
-        $request->validate([
-            'employee_id' => ['required','uuid'],
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'string'],
-        ]);
-        $user = User::create([
-            'employee_id' => $request->employee_id,
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->string('password')),
-            'role' => $request->role,
-        ]);
+    public function store(UserCreateRequest $request)
+    {
+        $data = $request->validated();
+        try {
+            $user = User::create($data);
+        } catch (\Illuminate\Database\QueryException $e) {
+            return response()->json([
+                'message' => 'Unable to save user.',
+                'errors' => ['email' => ['This email address is already in use.']],
+            ], 422);
+        }
 
-        return response()->json([
-            'message' => 'Registration successful',
-            'user' => $user,
-        ]);
+        return new UserResource($user);
     }
 
-    public function updateAccount(Request $request) {
+    public function update(User $user, UserCreateRequest $request)
+    {
+        $data = $request->validated();
+        $user->update($data);
+        return new UserResource($user);
+    }
+
+    public function updateAccount(Request $request)
+    {
         $user = Auth::user();
 
         $validated = $request->validate([
@@ -51,7 +54,8 @@ class UserController extends Controller
         return response()->json($user);
     }
 
-    public function updatePassword(Request $request) {
+    public function updatePassword(Request $request)
+    {
         $user = Auth::user();
 
         $validated = $request->validate([
@@ -65,10 +69,6 @@ class UserController extends Controller
 
         $user->password = Hash::make($validated['password']);
         $user->save();
-
-        // Auth::logout();
-        // $request->session()->invalidate();
-        // $request->session()->regenerateToken();
 
         return response()->json(['message' => 'Password updated. Please log in again.']);
     }

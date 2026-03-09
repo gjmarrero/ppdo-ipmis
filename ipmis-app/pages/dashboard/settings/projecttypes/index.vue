@@ -54,7 +54,10 @@ const handleEdit = async (project_type) => {
 
 const columns = getColumns(handleView, handleDelete, handleEdit)
 
-const handleSettingAddition = (updatedProjectType) => {
+const handleSettingAddition = (response) => {
+    if(!response) return
+    
+    const updatedProjectType = response.data.data
     const index = projectTypes.value.findIndex(o => o.id === updatedProjectType.id)
     if (index !== -1) {
         projectTypes.value.splice(index, 1, updatedProjectType)
@@ -67,7 +70,6 @@ const handleSettingAddition = (updatedProjectType) => {
     toast({
         description: index !== -1 ? 'Successfully updated' : 'Successfully added'
     })
-    fetchProjectTypes()
 }
 
 onMounted(() => {

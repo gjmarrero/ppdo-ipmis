@@ -40,7 +40,7 @@
                 <div v-for="(scope, index) in preEngineeringForm.scopes"
                     class="grid grid-cols-1 md:grid-cols-12 gap-2 flex-grow mb-2">
                     <div class="grid grid-cols-1 md:col-span-11 gap-2 flex-grow mb-2">
-                        <FormCombobox :options="specificWorks" placeholder="Select specific scope of work"
+                        <FormCombobox :options="specificWorksAsSource" placeholder="Select specific scope of work"
                             v-model="scope.scope_of_work_id" :name="'scopes[' + index + '][scope_of_work_id]'"
                             :id="'scope_of_work_id_' + index" />
                     </div>
@@ -138,10 +138,10 @@ import * as exifr from 'exifr'
 import CleaveInput from '../Form/CleaveInput.vue'
 import { PlusIcon, Trash2Icon } from 'lucide-vue-next'
 
-const { errorBag, transformValidationErrors, resetErrorBag } = useCustomError()
+const { errorBag } = useCustomError()
 const { employees, fetchEmployees } = useEmployees()
 const { projectTypes, fetchProjectTypes } = useProjectTypes()
-const { specificWorks, fetchSpecificWorks } = useSpecificScopeOfWorks()
+const { specificWorksAsSource, fetchSpecificWorksAsSource } = useSpecificScopeOfWorks()
 const { preEngineeringForm, images, imageInput, submitPreEngineering, resetForm, isSubmitting } = usePreEngineerings()
 
 const props = defineProps({
@@ -273,9 +273,9 @@ onMounted(async () => {
             preEngineeringForm.project_type_id = selected
         }
     }
-    fetchSpecificWorks()
+    fetchSpecificWorksAsSource()
     fetchEmployees()
-    console.log("Mounted preengform", props.funded_project?.latest_funding?.latest_preengineering)
+
 })
 
 </script>

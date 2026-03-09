@@ -50,12 +50,12 @@ const handleSubmit = async () => {
             emit('update:isSettingsAddDialogOpen', false)
         }
     })
+    console.log("emit this data", data)
     emit('settingAdded', data)
 }
 
 watch(() => props.projectTypeToEdit, (newVal) => {
     if (newVal) {
-        console.log("PT to edit", newVal)
         projectTypeForm.project_type = newVal.name
         projectTypeForm.project_type_code = newVal.project_type_code
     } else {

@@ -3,7 +3,7 @@
         <template #header>
             <div class="custom-header">
                 <h2 class="font-sans text-lg font-semibold">{{mode.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
-                    }} project</h2>
+                }} project</h2>
             </div>
         </template>
         <form @submit.prevent="handleSubmit">
@@ -209,7 +209,11 @@ const barangays = ref([])
 
 function fetchBarangaysByMunicipality(municipalityId) {
     api.get(`/api/municipalities/${municipalityId}/barangays`).then(({ data }) => {
-        barangays.value = data
+        barangays.value = [...data].sort((a, b) => {
+            const aName = (a.name ?? a.barangay ?? '').toString()
+            const bName = (b.name ?? b.barangay ?? '').toString()
+            return aName.localeCompare(bName, undefined, { sensitivity: 'base' })
+        })
     })
 }
 

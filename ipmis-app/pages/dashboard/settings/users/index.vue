@@ -5,8 +5,10 @@
             <Toaster />
         </ClientOnly>
         <div class="flex min-h-screen w-full flex-col px-2 py-2">
-            <SettingsUser v-model:isSettingsAddDialogOpen="isSettingsAddDialogOpen" :settingsType="settingsType"
-                :userToEdit="selectedUser" @settingAdded="handleSettingAddition" :mode="mode" />
+            <div class="flex flex-row justify-end">
+                <Button @click="openDialog" variant="newprimary" class="w-40">Add</Button>
+            </div>
+            <SettingsUser v-model:isSettingsAddDialogOpen="isSettingsAddDialogOpen" :userToEdit="selectedUser" @settingAdded="handleSettingAddition" />
             <DataTable :columns="columns" :data="users" :key="tableKey" />
         </div>
     </div>
@@ -18,12 +20,9 @@ import { getColumns } from './columns';
 import { toast, Toaster } from '@/components/ui/toast';
 
 const { api } = useAxios()
+const { users, fetchUsers } = useUsers()
 
 const tableKey = ref(0)
-
-const dialogKey = ref(0)
-
-const settingsType = ref('user')
 
 const handleView = (user) => {
     console.log('View clicked: ', user)
@@ -39,28 +38,23 @@ const handleDelete = async (user) => {
 
 const selectedUser = ref(null)
 
-const mode = ref('add')
+const isSettingsAddDialogOpen = ref(false)
 
 const handleEdit = async (user) => {
     selectedUser.value = user
-    console.log("Selected user", user)
-    mode.value = 'edit'
     isSettingsAddDialogOpen.value = true
 }
 
+const openDialog = () => {
+    selectedUser.value = null
+    isSettingsAddDialogOpen.value = true
+}
 const columns = getColumns(handleView, handleDelete, handleEdit)
 
-const users = ref([])
+const handleSettingAddition = (response) => {
+    if(!response) return
 
-const isSettingsAddDialogOpen = ref(false)
-
-const fetchUsers = async () => {
-    const response = await api.get('/api/users')
-    users.value = response.data.data
-}
-
-const handleSettingAddition = (updatedUser) => {
-    console.log("User", updatedUser)
+    const updatedUser = response.data.data
     const index = users.value.findIndex(o => o.id === updatedUser.id)
     if (index !== -1) {
         users.value.splice(index, 1, updatedUser)
@@ -75,11 +69,6 @@ const handleSettingAddition = (updatedUser) => {
     })
 }
 
-// watch(isSettingsAddDialogOpen, (val) => {
-//   if (!val) {
-//     dialogKey.value++
-//   }
-// })
 
 onMounted(() => {
     fetchUsers()

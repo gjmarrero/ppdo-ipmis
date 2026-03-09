@@ -39,6 +39,7 @@ class EnvironmentalClearanceController extends Controller
                 'latestFunding.fundsource',
                 'latestFunding.latestPreengineering',
                 'latestFunding.latestEnvironmentalClearance',
+                'latestFunding.latestEnvironmentalClearance.environmental_clearance_cmrs',
                 'latestFunding.latestImplementation'
             ])
                 ->whereHas('latestFunding')

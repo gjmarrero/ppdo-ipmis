@@ -5,8 +5,10 @@
             <Toaster />
         </ClientOnly>
         <div class="flex min-h-screen w-full flex-col px-2 py-2">
-            <SettingsPlantilla v-model:isSettingsAddDialogOpen="isSettingsAddDialogOpen" :settingsType="settingsType"
-                :plantillaToEdit="selectedPlantilla" @settingAdded="handleSettingAddition" :mode="mode" />
+            <div class="flex flex-row justify-end">
+                <Button @click="openDialog" variant="newprimary" class="w-40">Add</Button>
+            </div>
+            <SettingsPlantilla v-model:isSettingsAddDialogOpen="isSettingsAddDialogOpen" :plantillaToEdit="selectedPlantilla" @settingAdded="handleSettingAddition"  />
             <DataTable :columns="columns" :data="plantillas" :key="tableKey" />
         </div>
     </div>
@@ -18,10 +20,8 @@ import { getColumns } from './columns';
 import { toast, Toaster } from '@/components/ui/toast';
 
 const { api } = useAxios()
-
+const { plantillas, fetchPlantillas } = usePlantillas()
 const tableKey = ref(0)
-
-const settingsType = ref('plantilla')
 
 const handleView = (plantilla) => {
     console.log('View clicked: ', plantilla)
@@ -35,29 +35,26 @@ const handleDelete = async (plantilla) => {
     fetchPlantillas()
 }
 
-const selectedPlantilla = ref(null)
+const openDialog = () => {
+    selectedPlantilla.value = null
+    isSettingsAddDialogOpen.value = true
+}
 
-const mode = ref('add')
+const selectedPlantilla = ref(null)
 
 const handleEdit = async (plantilla) => {
     selectedPlantilla.value = plantilla
-    mode.value = 'edit'
     isSettingsAddDialogOpen.value = true
 }
 
 const columns = getColumns(handleView, handleDelete, handleEdit)
 
-const plantillas = ref([])
-
 const isSettingsAddDialogOpen = ref(false)
 
-const fetchPlantillas = async () => {
-    const response = await api.get('/api/plantillas')
-    plantillas.value = response.data.data
-}
+const handleSettingAddition = (response) => {
+    if(!response) return
 
-const handleSettingAddition = (updatedPlantilla) => {
-    console.log("Updated plantilla", updatedPlantilla)
+    const updatedPlantilla = response.data.data
     const index = plantillas.value.findIndex(o => o.id === updatedPlantilla.id)
     if (index !== -1) {
         plantillas.value.splice(index, 1, updatedPlantilla)

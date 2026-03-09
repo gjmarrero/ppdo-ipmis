@@ -1,6 +1,7 @@
 export function useEnvironmentalClearances(filterType) {
     const { api } = useAxios()
     const { user, me } = useAuth()
+    const { transformValidationErrors, resetErrorBag } = useCustomError()
     const loading = ref(false)
     const rawEnvironmentalClearances = ref([])
     const filteredEnvironmentalClearances = ref([])
@@ -25,7 +26,7 @@ export function useEnvironmentalClearances(filterType) {
     }
 
     const applyFilter = async () => {
-        
+
         const filter = filterType.value
         console.log("Raw EC", rawEnvironmentalClearances.value)
         if (filter === 'clearance_issued') {
@@ -142,6 +143,7 @@ export function useEnvironmentalClearances(filterType) {
     }
 
     const submitCmr = async ({ mode = 'add', environmentalClearanceId = null, environmentalClearanceCmrId = null, onSuccess } = {}) => {
+        resetErrorBag()
         isSubmittingCmr.value = true
         errors.value = {}
 
@@ -176,10 +178,10 @@ export function useEnvironmentalClearances(filterType) {
 
             return data
         } catch (err) {
-            if (err.response?.data?.errors) {
-                errors.value = err.response.data.errors
+            if (err.response) {
+                transformValidationErrors(err.response)
             } else {
-                console.error('Unexpected error', err)
+                console.log('Unexpected error', err)
             }
             throw err
         } finally {
@@ -188,6 +190,7 @@ export function useEnvironmentalClearances(filterType) {
     }
 
     const submitEnvironmentalClearance = async ({ mode = 'add', environmentalClearanceId = null, fundedProjectId, onSuccess } = {}) => {
+        resetErrorBag()
         isSubmitting.value = true
         errors.value = {}
 
@@ -226,16 +229,14 @@ export function useEnvironmentalClearances(filterType) {
                 headers: { 'Content-Type': 'multipart/form-data' }
             })
 
-            // resetForm()
-
             if (onSuccess) onSuccess(data)
 
             return data
         } catch (err) {
-            if (err.response?.data?.errors) {
-                errors.value = err.response.data.errors
+            if (err.response) {
+                transformValidationErrors(err.response)
             } else {
-                console.error('Unexpected error', err)
+                console.log('Unexpected error', err)
             }
             throw err
         } finally {
@@ -244,6 +245,7 @@ export function useEnvironmentalClearances(filterType) {
     }
 
     const submitUpdateOtherRequirements = async ({ onSuccess, validationId = null, projectId = null } = {}) => {
+        resetErrorBag()
         errors.value = {}
         console.log("Form value", updateOtherRequirementsForm.value)
         try {
@@ -284,8 +286,10 @@ export function useEnvironmentalClearances(filterType) {
 
             return response.data
         } catch (err) {
-            if (err.response?.data?.errors) {
-                errors.value = err.response.data.errors
+            if (err.response) {
+                transformValidationErrors(err.response)
+            } else {
+                console.log('Unexpected error', err)
             }
             throw err
         }

@@ -16,6 +16,8 @@ class ProjectTypeResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'name' => $this->project_type,
+            'project_type_code' => $this->project_type_code,
             'beneficiary_types' => BeneficiaryTypeResource::collection($this->whenLoaded('beneficiaryTypes')),
         ];
     }

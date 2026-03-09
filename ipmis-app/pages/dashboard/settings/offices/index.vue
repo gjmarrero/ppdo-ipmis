@@ -53,7 +53,11 @@ const columns = getColumns(handleView, handleDelete, handleEdit)
 
 const isSettingsAddDialogOpen = ref(false)
 
-const handleSettingAddition = (updatedOffice) => {
+const handleSettingAddition = (response) => {
+    if(!response) return
+
+    const updatedOffice = response.data.data
+    
     const index = offices.value.findIndex(o => o.id === updatedOffice.id)
     if (index !== -1) {
         offices.value.splice(index, 1, updatedOffice)
@@ -66,7 +70,6 @@ const handleSettingAddition = (updatedOffice) => {
     toast({
         description: index !== -1 ? 'Successfully updated' : 'Successfully added'
     })
-    fetchOffices()
 }
 
 onMounted(() => {

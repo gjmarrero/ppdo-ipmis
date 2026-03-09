@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PowForApprovalCreateRequest;
 use App\Http\Requests\PreengineeringStatusCreateRequest;
+use App\Http\Requests\PreengineeringStatusQcpCreateRequest;
+use App\Http\Requests\PreengineeringStatusReviewCreateRequest;
 use App\Http\Resources\FundedProjectResource;
 use App\Http\Resources\PreengineeringStatusResource;
 use App\Http\Resources\ProjectCompleteResource;
@@ -132,25 +135,6 @@ class PreengineeringStatusController extends Controller
 
     public function powForApproval(Request $request)
     {
-        // $forApprovalPows = FundedProject::with([
-        //     'project',
-        //     'project.latestValidation.validation_responsible_people',
-        //     'project.latestValidation.beneficiaries',
-        //     'project.latestValidation.beneficiaries.beneficiary_sdds',
-        //     'project.latestValidation.validation_images',
-        //     'project.latestValidation.validation_supporting_documents',
-        //     'project.latestValidation.validation_map_images',
-        //     'project.latestValidation.validation_other_requirements',
-        //     'latestPreengineering'
-        // ])
-        //     ->whereHas('latestPreengineering', function ($query) {
-        //         $query->where([['date_submitted_lce', '<>', null], ['date_approved_lce', null]]);
-        //     })
-        //     ->orderBy('created_at', 'desc')
-        //     ->get();
-
-        // return FundedProjectResource::collection($forApprovalPows);
-
         return ProjectCompleteResource::collection(Project::with(
             'locations.barangay.municipality',
             'user',
@@ -182,12 +166,13 @@ class PreengineeringStatusController extends Controller
 
     }
 
-    public function approvePow(Request $request)
+    public function approvePow(PowForApprovalCreateRequest $request)
     {
         $preengineering = PreengineeringStatus::findOrFail($request->preengineering_id);
-        $preengineering->update([
-            'date_approved_lce' => $request->date_approved_lce,
-        ]);
+
+        $data = $request->validated();
+
+        $preengineering->update($data);
     }
 
     public function fetchApprovedPow(Request $request)
@@ -231,35 +216,26 @@ class PreengineeringStatusController extends Controller
         return response()->json($count_my_assignments);
     }
 
-    public function update_qcp_status(Request $request, $preengineering_id)
+    public function update_qcp_status(PreengineeringStatusQcpCreateRequest $request, $preengineering_id)
     {
-        $preengineering_status = PreengineeringStatus::findOrFail($preengineering_id);
+        $preengineering = PreengineeringStatus::findOrFail($preengineering_id);
 
-        $preengineering_status->update([
-            'date_received_by_qc' => $request->date_received_by_qc ?? null,
-            'employee_id_qcp' => $request->employee_id_qcp ?? null,
-            'date_qcp_prepared' => $request->date_qcp_prepared ?? null,
-            'date_qcp_reviewed' => $request->date_qcp_reviewed ?? null,
-        ]);
+        $data = $request->validated();
+        $preengineering->update($data);
 
-        return response()->json([
-            'message' => 'QCP status updated',
-        ]);
+        return new PreengineeringStatusResource(
+            $preengineering->load('scopes')
+        );
     }
 
-    public function update_review_status(Request $request, $preengineering_id)
+    public function update_review_status(PreengineeringStatusReviewCreateRequest $request, $preengineering_id)
     {
-        $preengineering_status = PreengineeringStatus::findOrFail($preengineering_id);
+        $preengineering = PreengineeringStatus::findOrFail($preengineering_id);
+        $data = $request->validated();
+        $preengineering->update($data);
 
-        $preengineering_status->update([
-            'date_received_by_ape' => $request->date_received_by_ape ?? null,
-            'date_reviewed' => $request->date_reviewed ?? null,
-            'date_recommended_for_approval' => $request->date_recommended_for_approval ?? null,
-            'date_submitted_to_lce' => $request->date_submitted_to_lce ?? null,
-        ]);
-
-        return response()->json([
-            'message' => 'Review status updated',
-        ]);
+        return new PreengineeringStatusResource(
+            $preengineering->load('scopes')
+        );
     }
 }

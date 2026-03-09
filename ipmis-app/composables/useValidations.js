@@ -92,6 +92,7 @@ export function useValidations() {
     const submitValidation = async ({ mode = 'add', validationId = null, projectId, onSuccess, pamb = null } = {}) => {
         isSubmitting.value = true
         errors.value = {}
+        resetErrorBag()
         try {
             const formDataObject = new FormData()
             const excludeKeys = ['responsible_persons', 'beneficiaries', 'project_id']
@@ -152,10 +153,10 @@ export function useValidations() {
 
             return data
         } catch (err) {
-            if (err.response?.data?.errors) {
-                errors.value = err.response.data.errors
+            if (err.response) {
+                transformValidationErrors(err.response)
             } else {
-                console.error('Unexpected error', err)
+                console.log('Unexpected error', err)
             }
             throw err
         } finally {

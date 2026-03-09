@@ -23,7 +23,14 @@ class ImplementationOrderCreateRequest extends FormRequest
     {
         return [
             'order_type' => 'required|string',
-            'dts_barcode' => 'required'
+            'dts_barcode' => 'nullable',
+            'date_prepared' => 'nullable|date|before_or_equal:today',
+            'date_checked' => 'nullable|date|after_or_equal:date_prepared|before_or_equal:today',
+            'date_reviewed' => 'nullable|date|after_or_equal:date_checked|before_or_equal:today',
+            'date_recommended_for_approval' => 'nullable|date|after_or_equal:date_reviewed|before_or_equal:today',
+            'date_forwarded_to_lce' => 'nullable|date|after_or_equal:date_recommended_for_approval|before_or_equal:today',
+            'date_approved_by_lce' => 'nullable|date|after_or_equal:date_forwarded_to_lce|before_or_equal:today',
+            'date_signed_by_contractor' => 'nullable|date|after_or_equal:date_approved_by_lce|before_or_equal:today',
         ];
     }
 }

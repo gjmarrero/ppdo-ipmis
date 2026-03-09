@@ -135,7 +135,7 @@ export function useFundedProjects() {
     })
 
     const submitPdcResult = async ({ siteProblemId = null, onSuccess } = {}) => {
-
+        resetErrorBag()
         const formData = new FormData()
 
         formData.append('pdc_result', pdcResultForm.pdc_result)
@@ -145,17 +145,6 @@ export function useFundedProjects() {
         formData.append('additional_fund', cleanedAdditionalFund)
         formData.append('fundsource_id', pdcResultForm.fundsource_id)
         formData.append('remarks', pdcResultForm.remarks)
-
-        // pdcFiles.value.forEach(file => {
-        //     formData.append('files[]', file)
-        //     formData.append('file_types[]', 'pdc')
-        // })
-
-        // sbResFiles.value.forEach(file => {
-        //     formData.append('files[]', file)
-        //     formData.append('file_types[]', 'sbRes')
-        // })
-
         formData.append('site_problem_id', siteProblemId)
 
         try {
@@ -176,6 +165,7 @@ export function useFundedProjects() {
     }
 
     const submitFundedProject = async ({ mode = 'add', projectId = null, onSuccess, fundedProjectId = null } = {}) => {
+        resetErrorBag()
         isSubmitting.value = true
 
         const formData = new FormData()

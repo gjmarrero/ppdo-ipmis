@@ -1,6 +1,7 @@
 export function useOffices() {
     const { api } = useAxios()
     const offices = ref([])
+    const officesAsSource = ref([])
     const error = ref(null)
     const isSubmitting = ref(false)
 
@@ -21,8 +22,17 @@ export function useOffices() {
             offices.value = response.data.data
         } catch (err) {
             error.value = err
+        }        
+    }
+
+    const fetchOfficesAsSource = async () => {
+        error.value = null
+        try {
+            const response = await api.get('/api/fetchOffices')
+            officesAsSource.value = response.data
+        } catch (err) {
+            error.value = err
         }
-        
     }
 
     const submitOfficeForm = async ({ officeToEdit = null, onSuccess }) => {
@@ -48,6 +58,8 @@ export function useOffices() {
     return {
         offices,
         fetchOffices,
+        officesAsSource,
+        fetchOfficesAsSource,
         officeForm,
         resetForm,
         submitOfficeForm,

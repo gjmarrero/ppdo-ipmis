@@ -9,10 +9,9 @@
             <ProjectDetails :project="funded_project" @manage-other-requirements="manageOtherRequirements" />
         </div>
         <Separator class="mb-2 mt-2" />
+
         <div v-if="preEngineeringDetails" class="space-y-6">
-
             <h2 class="font-mono text-lg text-center">Pre-engineering Data</h2>
-
             <div class='grid grid-cols-1 gap-6 md:grid-cols-5'>
                 <div class="bg-cardbg border border-borderblackui p-4 rounded-lg shadow hover:shadow-md transition">
                     <h3 class="text-lg font-semibold mb-4 border-b pb-2">POW Information</h3>

@@ -164,13 +164,14 @@ export const getImplementationColumns = ({
             cell: ({ row }) => {
                 const value = row.getValue('date_documents_received')
                 if (value === 'Pending') {
-                    return h('div', { class: 'flex justify-center uppercase' }, [
-                        h('span', {
-                            class: 'px-2 py-1 text-l font-medium rounded-full bg-red-100 text-red-700'
-                        }, value)
-                    ])
+                    return h('div', { class: 'flex justify-center' },
+                        h(Badge,
+                            { variant: 'destructive', class: 'uppercase items-center justify-center text-center', style: 'border-radius: 10px 60px 30px' },
+                            () => value
+                        )
+                    )
                 }
-                return h('div', { class: 'flex justify-center' }, row.getValue('date_documents_received'))
+                return h('div', { class: 'flex justify-center' }, value)
             }
         },
         {
@@ -184,13 +185,14 @@ export const getImplementationColumns = ({
             cell: ({ row }) => {
                 const value = row.getValue('date_start_implementation')
                 if (value === 'Pending') {
-                    return h('div', { class: 'flex justify-center uppercase' }, [
-                        h('span', {
-                            class: 'px-2 py-1 text-l font-medium rounded-full bg-red-100 text-red-700'
-                        }, value)
-                    ])
+                    return h('div', { class: 'flex justify-center' },
+                        h(Badge,
+                            { variant: 'destructive', class: 'uppercase items-center justify-center text-center', style: 'border-radius: 10px 60px 30px' },
+                            () => value
+                        )
+                    )
                 }
-                return h('div', { class: 'flex justify-center' }, row.getValue('date_start_implementation'))
+                return h('div', { class: 'flex justify-center' }, value)
             }
         },
         // {

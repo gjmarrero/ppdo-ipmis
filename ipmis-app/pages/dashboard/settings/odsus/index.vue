@@ -5,8 +5,10 @@
             <Toaster />
         </ClientOnly>
         <div class="flex min-h-screen w-full flex-col px-2 py-2">
-            <SettingsOdsu v-model:isSettingsAddDialogOpen="isSettingsAddDialogOpen" :settingsType="settingsType"
-                :odsuToEdit="selectedOdsu" @settingAdded="handleSettingAddition" :mode="mode" />
+            <div class="flex flex-row justify-end">
+                <Button @click="openDialog" variant="newprimary" class="w-40">Add</Button>
+            </div>
+            <SettingsOdsu v-model:isSettingsAddDialogOpen="isSettingsAddDialogOpen" :odsuToEdit="selectedOdsu" @settingAdded="handleSettingAddition" />
             <DataTable :columns="columns" :data="odsus" :key="tableKey" />
         </div>
     </div>
@@ -14,16 +16,22 @@
 </template>
 
 <script setup>
-import { getColumns } from './columns';
-import { toast, Toaster } from '@/components/ui/toast';
+import { getColumns } from './columns'
+import { toast, Toaster } from '@/components/ui/toast'
 
 const { api } = useAxios()
+const { odsus, fetchOdsus } = useOdsus()
 
 const tableKey = ref(0)
 
-const settingsType = ref('odsu')
-
 const isSettingsAddDialogOpen = ref(false)
+
+const selectedOdsu = ref(null)
+
+const openDialog = () => {
+    selectedOdsu.value = null
+    isSettingsAddDialogOpen.value = true
+}
 
 const handleView = (odsu) => {
     console.log('View clicked: ', odsu)
@@ -37,27 +45,18 @@ const handleDelete = async (odsu) => {
     fetchOdsus()
 }
 
-const selectedOdsu = ref(null)
-
-const mode = ref('add')
-
 const handleEdit = async (odsu) => {
     selectedOdsu.value = odsu
-    mode.value = 'edit'
+    console.log("Sel Odsu", selectedOdsu)
     isSettingsAddDialogOpen.value = true
 }
 
 const columns = getColumns(handleView, handleDelete, handleEdit)
 
-const odsus = ref([])
+const handleSettingAddition = (response) => {
+    if(!response) return
 
-const fetchOdsus = async () => {
-    const response = await api.get('/api/odsus')
-    odsus.value = response.data.data
-}
-
-const handleSettingAddition = (updatedOdsu) => {
-    console.log("Added", updatedOdsu)
+    const updatedOdsu = response.data.data
     const index = odsus.value.findIndex(o => o.id === updatedOdsu.id)
     if (index !== -1) {
         odsus.value.splice(index, 1, updatedOdsu)

@@ -23,9 +23,9 @@ class EnvironmentalClearanceCmrRequest extends FormRequest
     {
         return [
             'environmental_clearance_id' => 'required|uuid',
-            'date_prepared' => 'nullable|date',
-            'date_submitted' => 'nullable|',
-            'file' => 'file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'date_prepared' => 'required|date|before_or_equal:today',
+            'date_submitted' => 'nullable|date|before_or_equal:today|after_or_equal:date_prepared',
+            'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
             'remarks' => 'nullable'
         ];
     }

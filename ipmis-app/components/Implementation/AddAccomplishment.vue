@@ -1,14 +1,14 @@
 <template>
     <Dialog v-model:open="isOpen">
-        <DialogContent class="max-w-4xl w-full">
+        <DialogContent class="max-w-4xl w-full bg-dialogbg border border-drawerborder text-textsecondary">
             <DialogHeader>
                 <DialogTitle></DialogTitle>
                 <DialogDescription>
                     Add or Update Accomplishment
                 </DialogDescription>
             </DialogHeader>
-            <div v-for="(item, index) in implementation.monthly_schedule_accomplishment" :key="item.id"
-                class="p-2 border rounded mb-1 flex justify-between items-center">
+            <div v-for="(item, index) in activeAccomplishments" :key="item.id"
+                class="p-2 border border-borderblackui rounded mb-1 flex justify-between items-center">
                 <div>
                     <p class="font-semibold">
                         {{ formatMonth(item.month) }}
@@ -28,14 +28,18 @@
                 </div>
             </div>
 
-            <Button @click="saveChanges">Save</Button>
+            <div class="flex flex-row justify-end text-textprimary gap-2 mt-4">
+                <Button type="button" variant="newprimary" size="lg" :disabled="isSubmitting" @click="saveChanges">
+                    <Spinner v-if="isSubmitting" :show="true" size="lg" label="Saving..." />
+                    <span v-else>Submit</span>
+                </Button>
+            </div>
         </DialogContent>
     </Dialog>
 </template>
 
 <script setup>
 const { api } = useAxios()
-import { Button } from "@/components/ui/button"
 import {
     Dialog,
     DialogContent,
@@ -55,13 +59,28 @@ const props = defineProps({
 
 const emit = defineEmits(['form-submitted'])
 
-const formData = ref(
-    props.implementation.monthly_schedule_accomplishment.map(item => ({
-        id: item.id,
-        month: item.month,
-        target: item.target,
-        actual: item.actual
-    }))
+const isSubmitting = ref(false)
+
+const activeAccomplishments = computed(() => {
+    return props.implementation?.monthly_schedule_accomplishment?.filter(item => item.is_active) || []
+})
+
+const initialFormData = ref([])
+
+const formData = ref([])
+
+watch(
+    () => activeAccomplishments.value,
+    (newVal) => {
+        const mapped = newVal.map(item => ({
+            id: item.id,
+            actual: item.actual
+        }))
+
+        formData.value = mapped
+        initialFormData.value = JSON.parse(JSON.stringify(mapped))
+    },
+    { immediate: true }
 )
 
 const formatMonth = (monthStr) => {
@@ -88,13 +107,23 @@ const canEdit = (month) => {
 }
 
 const saveChanges = async () => {
-    console.log("props imp", props.implementation)
-    const changed = formData.value.filter((item, idx) => {
-        const original = props.implementation.monthly_schedule_accomplishment[idx]
-        return item.actual !== original.actual
+    console.log(formData.value, initialFormData.value)
+
+    isSubmitting.value = true
+
+    const changed = formData.value.filter(item => {
+        const initialItem = initialFormData.value?.find(
+            i => i.id === item.id
+        )
+        console.log("error in changed")
+        return initialItem && item.actual !== initialItem.actual
     })
 
-    if (changed.length === 0) return
+    if (changed.length === 0) {
+        isSubmitting.value = false
+        console.log("error in length")
+        return
+    }
 
     try {
         await api.post("/api/accomplishments/batch_update", changed)
@@ -102,8 +131,30 @@ const saveChanges = async () => {
         emit('form-submitted')
     } catch (error) {
         console.error("Save failed", error)
+    } finally {
+        isSubmitting.value = false
     }
 }
+
+// const saveChanges = async () => {
+//     console.log('formData length:', formData.value, 'initialFormData length:', initialFormData.value)
+//     isSubmitting.value = true
+//     const changed = formData.value.filter((item, idx) => {
+//         return item.actual !== initialFormData.value[idx].actual
+//     })
+
+//     if (changed.length === 0) return
+
+//     try {
+//         await api.post("/api/accomplishments/batch_update", changed)
+//         console.log("Saved successfully")
+//         emit('form-submitted')
+//     } catch (error) {
+//         console.error("Save failed", error)
+//     } finally {
+//         isSubmitting.value = false
+//     }
+// }
 
 
 </script>

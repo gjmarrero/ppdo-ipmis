@@ -24,23 +24,16 @@ class PreengineeringStatusCreateRequest extends FormRequest
         return [
             'funded_project_id' => 'required|uuid|exists:funded_projects,id',
             'employee_id' => 'required|uuid|exists:employees,id',
-            'date_conducted' => 'required|date',
+            'date_conducted' => 'required|date|before_or_equal:today',
             'programmed_cost' => 'required',
             'project_type_id' => 'required',
-            'scopes' => ['required'],
-            'scopes.*.scope_of_work_id' => ['required'],
-            'scopes.*.description' => ['required'],
-            'date_prepared_pow' => 'nullable|date',
-            'date_checked_pow' => 'nullable|date',
-            'date_reviewed_pow' => 'nullable|date',
-            'date_received_by_qc' => 'nullable|date',
-            'employee_id_qcp' => 'nullable',
-            'date_qcp_prepared' => 'nullable|date',
-            'date_qcp_reviewed' => 'nullable|date',
-            'date_approved_pe' => 'nullable',
-            'date_submitted_lce' => 'nullable',
-            'date_submitted_divhead' => 'nullable',
-            'date_approved_lce' => 'nullable'
+            'scopes' => 'required',
+            'scopes.*.scope_of_work_id' => 'required',
+            'scopes.*.description' => 'required',
+            'date_prepared_pow' => 'nullable|date|after_or_equal:date_conducted|before_or_equal:today',
+            'date_checked_pow' => 'nullable|date|after_or_equal:date_prepared_pow|before_or_equal:today',
+            'date_reviewed_pow' => 'nullable|date|after_or_equal:date_checked_pow|before_or_equal:today',
+            'date_approved_lce' => 'nullable|date|after_or_equal:date_submitted_lce|before_or_equal:today',
         ];
     }
 }

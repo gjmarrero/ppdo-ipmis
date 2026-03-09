@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-const { errorBag, transformValidationErrors, resetErrorBag } = useCustomError()
+const { errorBag } = useCustomError()
 const { forApprovalPowForm, submitApprovedPow, isSubmitting } = usePowForApproval()
 
 const props = defineProps({

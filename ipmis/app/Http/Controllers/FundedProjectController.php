@@ -222,14 +222,35 @@ class FundedProjectController extends Controller
 
     public function checkTitle(Request $request)
     {
-        $query = Project::where('title', $request->title);
+        $titleQuery = Project::query();
+        $numberQuery = FundedProject::query();
 
-        if ($request->ignore_id) {
-            $query->where('id', '!=', $request->ignore_id);
+        if ($request->filled('title')) {
+            $titleQuery->where('title', $request->title);
         }
 
+        if ($request->ignore_id) {
+            $titleQuery->where('id', '!=', $request->ignore_id);
+        }
+
+        if ($request->filled('number')) {
+            $numberQuery->where('number', $request->number);
+        }
+
+        if ($request->ignore_funded_id) {
+            $numberQuery->where('id', '!=', $request->ignore_funded_id);
+        } elseif ($request->ignore_id) {
+            // Fallback when frontend only passes project ID in edit mode
+            $numberQuery->where('project_id', '!=', $request->ignore_id);
+        }
+
+        $titleExists = $request->filled('title') ? $titleQuery->exists() : false;
+        $numberExists = $request->filled('number') ? $numberQuery->exists() : false;
+
         return response()->json([
-            'exists' => $query->exists()
+            'exists' => $titleExists || $numberExists,
+            'title_exists' => $titleExists,
+            'number_exists' => $numberExists
         ]);
     }
 

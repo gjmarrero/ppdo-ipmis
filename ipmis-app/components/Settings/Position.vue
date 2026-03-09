@@ -1,45 +1,37 @@
 <template>
-    <div class="flex flex-row justify-end">
-        <Button @click="openDialog" variant="newprimary" class="w-40">Add</Button>
-    </div>
-
     <Dialog :open="props.isSettingsAddDialogOpen" @update:open="(val) => emit('update:isSettingsAddDialogOpen', val)">
         <DialogContent class="bg-dialogbg text-textsecondary">
             <DialogHeader>
-                <DialogTitle>{{(dialogTitle.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()))}}</DialogTitle>
+                <DialogTitle>{{ isEditing ? 'Edit Position' : 'Add Position' }}</DialogTitle>
             </DialogHeader>
-            <div v-if="settingsType === 'position'">
-                <form @submit.prevent="handlePositionFormSubmit">
-                    <div class="mb-2">
-                        <FormLabel>Office/Division</FormLabel>
-                        <FormCombobox :options="odsus" v-model="positionForm.odsu_id" />
-                    </div>
-                    <FormGroup v-model="positionForm.title" :errorMessage="errorBag.title"
-                        label="Title" name="title" type="text"
-                        required labelFor="title" class="my-5" />
+            <form @submit.prevent="handleSubmit">
+                <div class="mb-2">
+                    <FormLabel>Office/Division</FormLabel>
+                    <FormCombobox :options="odsusAsSource" v-model="positionForm.odsu_id" />
+                </div>
+                <FormGroup v-model="positionForm.title" :errorMessage="errorBag.title" label="Title" name="title"
+                    type="text" required labelFor="title" class="my-5" />
 
-                    <div class="flex flex-row justify-end text-textprimary">
-                        <Button type="submit" variant="newprimary" :disabled="loading">Submit</Button>
-                    </div>
-                </form>
-            </div>
+                <div class="flex flex-row justify-end text-textprimary">
+                    <Button type="submit" variant="newprimary" size="lg" :disabled="isSubmitting">
+                        <Spinner v-if="isSubmitting" :show="true" size="lg" label="Saving..." />
+                        <span v-else>Submit</span>
+                    </Button>
+                </div>
+            </form>
         </DialogContent>
     </Dialog>
 </template>
 
 <script setup>
 
-const { api } = useAxios()
+const { positionForm, resetForm, isSubmitting, submitPositionForm } = usePositions()
+const { odsusAsSource, fetchOdsusAsSource } = useOdsus()
 
 const { errorBag } = useAuth()
 
 const props = defineProps({
     isSettingsAddDialogOpen: Boolean,
-    settingsType: String,
-    mode: {
-        type: String,
-        default: 'add',
-    },
     positionToEdit: {
         type: Object,
         default: null,
@@ -48,45 +40,17 @@ const props = defineProps({
 
 const emit = defineEmits(['update:isSettingsAddDialogOpen', 'settingAdded'])
 
-const openDialog = () => {
-    emit('update:isSettingsAddDialogOpen', true)
-}
+const isEditing = computed(() => !!props.positionToEdit)
 
-const positionForm = reactive({
-    'odsu_id': '',
-    'title': ''
-})
-
-const resetForm = () => {
-    positionForm.odsu_id = ''
-    positionForm.title = ''
-}
-const loading = ref(false)
-
-const handlePositionFormSubmit = async () => {
-    loading.value = true
-    try {
-        let response
-        if (props.positionToEdit) {
-            response = await api.put(`/api/position/${props.positionToEdit.id}`, positionForm)
-        } else {
-            response = await api.post('/api/position', positionForm)
+const handleSubmit = async () => {
+    const data = await submitPositionForm({
+        positionToEdit: props.positionToEdit,
+        onSuccess: () => {
+            emit('form-submitted')
+            emit('update:isSettingsAddDialogOpen', false)
         }
-        resetForm()
-        emit('update:isSettingsAddDialogOpen', false)
-        emit('settingAdded', response.data.data)
-    } catch (error) {
-        console.error('Save failed:', error)
-    } finally {
-        loading.value = false
-    }
-}
-
-const odsus = ref([])
-
-const fetchOdsus = async () => {
-    const response = await api.get('/api/fetchOdsus')
-    odsus.value = response.data
+    })
+    emit('settingAdded', data)
 }
 
 watch(() => props.positionToEdit, (newVal) => {
@@ -99,15 +63,13 @@ watch(() => props.positionToEdit, (newVal) => {
     }
 }, { immediate: true })
 
-const dialogTitle = ref('add')
-
-watch(() => props.mode, (newVal) => {
-    if(newVal) {
-        dialogTitle.value = newVal
+watch(() => props.isSettingsAddDialogOpen, (isOpen) => {
+    if (!isOpen) {
+        resetForm()
     }
 })
 
 onMounted(() => {
-    fetchOdsus()
+    fetchOdsusAsSource()
 })
 </script>

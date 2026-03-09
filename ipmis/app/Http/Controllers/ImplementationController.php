@@ -45,7 +45,12 @@ class ImplementationController extends Controller
             'latestFunding.fundsource',
             'latestFunding.latestPreengineering',
             'latestFunding.latestEnvironmentalClearance',
-            'latestFunding.latestImplementation'
+            'latestFunding.latestImplementation',
+            'latestFunding.latestImplementation.implementation_monthly_accomplishments',
+            'latestFunding.latestImplementation.orders',
+            'latestFunding.latestImplementation.orders.files',
+            'latestFunding.latestImplementation.inspections',
+            'latestFunding.latestImplementation.inspections.files'
         )
             ->where('status', 'funded')
             ->orderBy('updated_at', 'desc')
@@ -68,6 +73,24 @@ class ImplementationController extends Controller
 
         $implementation = Implementation::findOrFail($id);
         $implementation->update($data);
+    }
+
+    public function getExpectedSchedule($id, $duration)
+    {
+        $implementation = Implementation::findOrFail($id);
+        $startDate = Carbon::parse($implementation->date_start);
+        $months = [];
+
+        $monthsCount = max(1, ceil($duration / 30));
+
+        for ($i = 0; $i < $monthsCount; $i++) {
+            $months[] = $startDate->copy()
+                ->addMonths($i)
+                ->startOfMonth()
+                ->format('Y-m-d');
+        }
+
+        return response()->json(['months' => $months]);
     }
 
     public function monthlySchedule(Implementation $implementation, $duration)
@@ -96,6 +119,7 @@ class ImplementationController extends Controller
     public function monthlyTarget(Implementation $implementation)
     {
         $monthlyTargets = $implementation->implementation_monthly_accomplishments()
+            ->where('is_active', true)
             ->orderBy('month', 'asc')
             ->get(['id', 'month', 'target']);
 
@@ -107,28 +131,58 @@ class ImplementationController extends Controller
 
 
     public function store_monthly_targets(Request $request)
-    {
-        $validated = $request->validate([
-            'implementation_id' => 'required|exists:implementations,id',
-            'targets' => 'required|array',
-            'targets.*.rawMonth' => 'required|date',
-            'targets.*.target' => 'required|numeric',
-        ]);
+    { {
+            $validated = $request->validate([
+                'implementation_id' => 'required|exists:implementations,id',
+                'targets' => 'required|array',
+                'targets.*.rawMonth' => 'required|date',
+                'targets.*.target' => 'required|numeric',
+            ]);
 
-        foreach ($validated['targets'] as $target) {
-            ImplementationMonthlyAccomplishment::updateOrCreate(
-                [
-                    'implementation_id' => $validated['implementation_id'],
-                    'month' => $target['rawMonth'],
-                ],
-                [
-                    'target' => $target['target'],
-                    'user_id' => Auth::id()
-                ]
-            );
+            $implementation_id = $validated['implementation_id'];
+            $currentActive = ImplementationMonthlyAccomplishment::where('implementation_id', $implementation_id)
+                ->where('is_active', true)
+                ->pluck('month')
+                ->toArray();
+            $sentMonths = array_column($validated['targets'], 'rawMonth');
+
+            $monthsChanged = !empty(array_diff($currentActive, $sentMonths)) || !empty(array_diff($sentMonths, $currentActive));
+
+            if ($monthsChanged) {
+                // Deactivate current active schedules
+                ImplementationMonthlyAccomplishment::where('implementation_id', $implementation_id)
+                    ->where('is_active', true)
+                    ->update(['is_active' => false]);
+
+                // Create new active schedules
+                foreach ($validated['targets'] as $target) {
+                    ImplementationMonthlyAccomplishment::create([
+                        'implementation_id' => $implementation_id,
+                        'month' => $target['rawMonth'],
+                        'target' => $target['target'],
+                        'user_id' => Auth::id(),
+                        'is_active' => true
+                    ]);
+                }
+            } else {
+                // Update existing active schedules
+                foreach ($validated['targets'] as $target) {
+                    ImplementationMonthlyAccomplishment::updateOrCreate(
+                        [
+                            'implementation_id' => $implementation_id,
+                            'month' => $target['rawMonth'],
+                            'is_active' => true
+                        ],
+                        [
+                            'target' => $target['target'],
+                            'user_id' => Auth::id()
+                        ]
+                    );
+                }
+            }
+
+            return response()->json(['message' => 'Targets saved successfully']);
         }
-
-        return response()->json(['message' => 'Targets saved successfully']);
     }
 
     public function nextAccomplishmentMonth(Implementation $implementation)

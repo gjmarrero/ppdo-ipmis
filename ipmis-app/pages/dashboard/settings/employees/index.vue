@@ -5,8 +5,11 @@
             <Toaster />
         </ClientOnly>
         <div class="flex min-h-screen w-full flex-col px-2 py-2">
-            <SettingsEmployee v-model:isSettingsAddDialogOpen="isSettingsAddDialogOpen" :settingsType="settingsType"
-                :employeeToEdit="selectedEmployee" @settingAdded="handleSettingAddition" :mode="mode" />
+            <div class="flex flex-row justify-end">
+                <Button @click="openDialog" variant="newprimary" class="w-40">Add</Button>
+            </div>
+            <SettingsEmployee v-model:isSettingsAddDialogOpen="isSettingsAddDialogOpen"
+                :employeeToEdit="selectedEmployee" @settingAdded="handleSettingAddition" />
             <DataTable :columns="columns" :data="allEmployees" :key="tableKey" />
         </div>
     </div>
@@ -18,7 +21,7 @@ import { getColumns } from './columns';
 import { toast, Toaster } from '@/components/ui/toast';
 
 const { api } = useAxios()
-const { employees, allEmployees, fetchEmployees, fetchAllEmployees } = useEmployees()
+const { allEmployees, fetchAllEmployees } = useEmployees()
 
 const tableKey = ref(0)
 
@@ -46,17 +49,25 @@ const handleEdit = async (employee) => {
     isSettingsAddDialogOpen.value = true
 }
 
+const openDialog = () => {
+    selectedEmployee.value = null
+    isSettingsAddDialogOpen.value = true
+}
+
 const columns = getColumns(handleView, handleDelete, handleEdit)
 
 const isSettingsAddDialogOpen = ref(false)
 
-const handleSettingAddition = (updatedEmployee) => {
-    console.log("Updated Emp", updatedEmployee)
-    const index = allEmployees.value.findIndex(o => o.id === updatedEmployee.id)
+const handleSettingAddition = (response) => {
+    if (!response) return
+
+    const updatedEmployee = response.data.data
+    const index = allEmployees.value.findIndex(o => String(o.id) === String(updatedEmployee.id))
+
     if (index !== -1) {
-        allEmployees.value.splice(index, 1, updatedEmployee)
-        allEmployees.value = [...allEmployees.value]
-        tableKey.value++
+        const updated = [...allEmployees.value]
+        updated[index] = { ...updatedEmployee }
+        allEmployees.value = updated
     } else {
         allEmployees.value = [...allEmployees.value, { ...updatedEmployee }]
     }

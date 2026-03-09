@@ -1,46 +1,38 @@
 <template>
-    <div class="flex flex-row justify-end">
-        <Button @click="openDialog" variant="newprimary" class="w-40">Add</Button>
-    </div>
-
     <Dialog :autoFocus="false" :open="props.isSettingsAddDialogOpen"
         @update:open="(val) => emit('update:isSettingsAddDialogOpen', val)">
         <DialogContent class="bg-dialogbg border border-drawerborder text-textsecondary">
             <DialogHeader>
-                <DialogTitle>{{(dialogTitle.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()))}}</DialogTitle>
+                <DialogTitle>{{ isEditing ? 'Edit Office-Division' : 'Add Office-Division' }}</DialogTitle>
             </DialogHeader>
-            <div v-if="settingsType === 'odsu'">
-                <form @submit.prevent="handleOdsuFormSubmit">
-                    <div class="mb-2">
-                        <FormLabel>Office</FormLabel>
-                        <FormCombobox :options="offices" v-model="odsuForm.office_id" />
-                    </div>
-                    <div class="mb-2">
-                        <FormLabel>Division</FormLabel>
-                        <FormCombobox :options="divisions" v-model="odsuForm.division_id" />
-                    </div>
-                    <div class="flex flex-row justify-end text-textprimary pt-4">
-                        <Button type="submit" variant="newprimary" :disabled="loading">Submit</Button>
-                    </div>
-                </form>
-            </div>
+            <form @submit.prevent="handleSubmit">
+                <div class="mb-2">
+                    <FormLabel>Office</FormLabel>
+                    <FormCombobox :options="officesAsSource" v-model="odsuForm.office_id" />
+                </div>
+                <div class="mb-2">
+                    <FormLabel>Division</FormLabel>
+                    <FormCombobox :options="divisions" v-model="odsuForm.division_id" />
+                </div>
+                <div class="flex flex-row justify-end text-textprimary">
+                    <Button type="submit" variant="newprimary" size="lg" :disabled="isSubmitting">
+                        <Spinner v-if="isSubmitting" :show="true" size="lg" label="Saving..." />
+                        <span v-else>Submit</span>
+                    </Button>
+                </div>
+            </form>
         </DialogContent>
     </Dialog>
 </template>
 
 <script setup>
 
-const { api } = useAxios()
-
-const { errorBag } = useAuth()
+const { divisions, fetchDivisions, odsuForm, submitOdsuForm, resetForm, isSubmitting } = useOdsus()
+const { officesAsSource, fetchOfficesAsSource } = useOffices()
+const { errorBag } = useCustomError()
 
 const props = defineProps({
     isSettingsAddDialogOpen: Boolean,
-    settingsType: String,
-    mode: {
-        type: String,
-        default: 'add',
-    },
     odsuToEdit: {
         type: Object,
         default: null,
@@ -49,52 +41,17 @@ const props = defineProps({
 
 const emit = defineEmits(['update:isSettingsAddDialogOpen', 'settingAdded'])
 
-const openDialog = () => {
-    emit('update:isSettingsAddDialogOpen', true)
-}
+const isEditing = computed(() => !!props.odsuToEdit)
 
-const odsuForm = reactive({
-    'office_id': '',
-    'division_id': ''
-})
-
-const resetForm = () => {
-    odsuForm.office_id = ''
-    odsuForm.division_id = ''
-}
-const loading = ref(false)
-
-const handleOdsuFormSubmit = async () => {
-    loading.value = true
-    try {
-        let response
-        if (props.odsuToEdit) {
-            response = await api.put(`/api/odsu/${props.odsuToEdit.id}`, odsuForm)
-        } else {
-            response = await api.post('/api/odsu', odsuForm)
+const handleSubmit = async () => {
+    const data = await submitOdsuForm({
+        odsuToEdit: props.odsuToEdit,
+        onSuccess: () => {
+            emit('form-submitted')
+            emit('update:isSettingsAddDialogOpen', false)
         }
-        resetForm()
-        emit('update:isSettingsAddDialogOpen', false)
-        emit('settingAdded', response.data.data)
-    } catch (error) {
-        console.error('Save failed:', error)
-    } finally {
-        loading.value = false
-    }
-}
-
-const offices = ref([])
-
-const fetchOffices = async () => {
-    const response = await api.get('/api/fetchOffices')
-    offices.value = response.data
-}
-
-const divisions = ref([])
-
-const fetchDivisions = async () => {
-    const response = await api.get('/api/fetchDivisions')
-    divisions.value = response.data
+    })
+    emit('settingAdded', data)
 }
 
 watch(() => props.odsuToEdit, (newVal) => {
@@ -107,16 +64,15 @@ watch(() => props.odsuToEdit, (newVal) => {
     }
 }, { immediate: true })
 
-const dialogTitle = ref('add')
-
-watch(() => props.mode, (newVal) => {
-    if(newVal) {
-        dialogTitle.value = newVal
+watch(() => props.isSettingsAddDialogOpen, (isOpen) => {
+    if (!isOpen) {
+        resetForm()
     }
 })
 
 onMounted(() => {
-    fetchOffices()
+    fetchOfficesAsSource()
     fetchDivisions()
+    console.log("Odsu to edit", props.odsuToEdit)
 })
 </script>
