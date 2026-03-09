@@ -194,9 +194,10 @@ class DashboardController extends Controller
         $counts = DB::table('funded_projects')
             ->join('projects', 'funded_projects.project_id', '=', 'projects.id')
             ->join('locations', 'projects.id', '=', 'locations.project_id')
-            ->join('barangays', 'locations.barangay_id', '=', 'barangays.id')
-            ->join('municipalities', 'barangays.municipality_id', '=', 'municipalities.id')
-            ->select('municipalities.municipality', DB::raw('COUNT(funded_projects.id) as total'))
+            ->leftJoin('barangays', 'locations.barangay_id', '=', 'barangays.id')
+            ->leftJoin('municipalities', DB::raw('COALESCE(locations.municipality_id, barangays.municipality_id)'), '=', 'municipalities.id')
+            ->whereNotNull('municipalities.id')
+            ->select('municipalities.municipality', DB::raw('COUNT(DISTINCT funded_projects.project_id) as total'))
             ->groupBy('municipalities.id', 'municipalities.municipality')
             ->get();
 
