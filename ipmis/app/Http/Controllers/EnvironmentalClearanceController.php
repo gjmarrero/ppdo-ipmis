@@ -99,15 +99,22 @@ class EnvironmentalClearanceController extends Controller
     public function updateOtherRequirement(Request $request)
     {
         $incoming = $request->input('requirements', []);
+        $projectId = $request->input('project_id');
 
-        if (empty($incoming)) {
-            return response()->json(['message' => 'No data received'], 400);
+        if (is_string($incoming)) {
+            $incoming = json_decode($incoming, true) ?? [];
         }
 
-        $projectId = $incoming[0]['project_id'] ?? null;
-
         if (!$projectId) {
-            return response()->json(['message' => 'project_id is required'], 400);
+            return response()->json(['message' => 'project_id is required', $projectId], 400);
+        }
+
+        if (empty($incoming)) {
+            ProjectOtherRequirement::where('project_id', $projectId)->delete();
+
+            return response()->json([
+                'message' => 'All requirements removed successfully'
+            ]);
         }
 
         // Delete removed requirements
@@ -163,6 +170,7 @@ class EnvironmentalClearanceController extends Controller
         }
 
         return response()->json(['message' => 'Other Requirements updated successfully']);
+        
     }
 
     // public function updateOtherRequirement(Request $request)

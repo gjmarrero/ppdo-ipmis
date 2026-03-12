@@ -244,12 +244,20 @@ export function useEnvironmentalClearances(filterType) {
         }
     }
 
-    const submitUpdateOtherRequirements = async ({ onSuccess, validationId = null, projectId = null } = {}) => {
+    const submitUpdateOtherRequirements = async ({ onSuccess, validationId = null, projectId = null, deletedRequirementIds = [] } = {}) => {
         resetErrorBag()
         errors.value = {}
         console.log("Form value", updateOtherRequirementsForm.value)
         try {
             const formData = new FormData()
+
+            formData.append('validation_id', validationId)
+            formData.append('project_id', projectId)
+
+            if (!updateOtherRequirementsForm.value.length) {
+                formData.append('requirements', JSON.stringify([]))
+            }
+
             updateOtherRequirementsForm.value.forEach((item, index) => {
                 formData.append(`requirements[${index}][id]`, item.id || '')
                 formData.append(`requirements[${index}][requirement_type]`, item.requirement_type)
@@ -259,8 +267,6 @@ export function useEnvironmentalClearances(filterType) {
                 formData.append(`requirements[${index}][status]`, item.status)
                 formData.append(`requirements[${index}][remarks]`, item.remarks)
                 formData.append(`requirements[${index}][employee_id]`, item.employee_id)
-                formData.append(`requirements[${index}][project_id]`, projectId)
-                formData.append(`requirements[${index}][validation_id]`, validationId)
 
                 if (item.files && item.files.length) {
                     item.files.forEach(file => {
@@ -269,6 +275,14 @@ export function useEnvironmentalClearances(filterType) {
                     })
                 }
             })
+
+            deletedRequirementIds.forEach((id, index) => {
+                formData.append(`deleted_requirement_ids[${index}]`, id)
+            })
+
+            // if (!deletedRequirementIds.length) {
+            //     formData.append('deleted_requirement_ids', JSON.stringify([]))
+            // }
 
             formData.append('_method', 'PUT')
 

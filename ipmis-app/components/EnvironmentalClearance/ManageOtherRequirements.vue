@@ -136,6 +136,7 @@ const modelValue = computed({
 })
 
 const otherRequirements = computed(() => props.project?.project_other_requirements || [])
+const deletedRequirementIds = ref([])
 
 const statusOptions = [
     { id: 'Ongoing', name: 'Ongoing' },
@@ -196,7 +197,9 @@ const handleSubmit = async () => {
     await submitUpdateOtherRequirements({
         validationId: props?.project?.validation?.data?.id,
         projectId: props?.project?.id,
+        deletedRequirementIds: deletedRequirementIds.value,
         onSuccess: () => {
+            deletedRequirementIds.value = []
             emit('submitted')
             emit('update:modelValue', false)
             isSubmitting.value = false
@@ -210,24 +213,39 @@ function toggleRequirementType(type, checked) {
             selectedRequirementTypes.value.push(type)
         }
 
+        const existingRequirement = otherRequirements.value
+            .find(r => r.requirement_type === type)
+
+        if (existingRequirement?.id) {
+            deletedRequirementIds.value = deletedRequirementIds.value
+                .filter(id => id !== existingRequirement.id)
+        }
+
         const exists = updateOtherRequirementsForm.value
             .find(r => r.requirement_type === type)
 
         if (!exists) {
             updateOtherRequirementsForm.value.push({
+                id: existingRequirement?.id || null,
                 requirement_type: type,
-                date_applied: '',
-                date_issued: '',
-                employee_id: '',
-                status: '',
-                remarks: '',
-                files: [
-                    { file: '' }
-                ],
+                pamb_type_id: existingRequirement?.pamb_type_id || '',
+                date_applied: existingRequirement?.date_applied || '',
+                date_issued: existingRequirement?.date_issued || '',
+                employee_id: existingRequirement?.employee_id || '',
+                status: existingRequirement?.status || '',
+                remarks: existingRequirement?.remarks || '',
+                files: [],
             })
         }
 
     } else {
+        const requirementToRemove = updateOtherRequirementsForm.value
+            .find(r => r.requirement_type === type)
+
+        if (requirementToRemove?.id && !deletedRequirementIds.value.includes(requirementToRemove.id)) {
+            deletedRequirementIds.value.push(requirementToRemove.id)
+        }
+
         selectedRequirementTypes.value = selectedRequirementTypes.value.filter(t => t !== type)
 
         updateOtherRequirementsForm.value =
