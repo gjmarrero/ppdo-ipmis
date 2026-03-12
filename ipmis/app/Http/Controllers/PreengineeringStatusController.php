@@ -40,6 +40,7 @@ class PreengineeringStatusController extends Controller
                 'latestFunding.latestSiteProblem',
                 'latestFunding.fundsource',
                 'latestFunding.latestPreengineering',
+                'latestFunding.latestPreengineering.preengineering_images',
                 'latestFunding.latestEnvironmentalClearance',
                 'latestFunding.latestImplementation'
             ])
@@ -56,9 +57,7 @@ class PreengineeringStatusController extends Controller
             'scopes',
         ]);
 
-        $project_data =
-
-            $preengineering_status = $request->user()->preengineering_statuses()->create($preengineering_data);
+        $project_data = $preengineering_status = $request->user()->preengineering_statuses()->create($preengineering_data);
 
         foreach ($data['scopes'] as $scope) {
             $preengineering_status->scopes()->create([
@@ -77,7 +76,7 @@ class PreengineeringStatusController extends Controller
 
         if ($request->hasFile('images.*.file')) {
             foreach ($request->images as $imageData) {
-                $path = $imageData['file']->store('validation_images', 'public');
+                $path = $imageData['file']->store('preengineering_images', 'public');
 
                 $preengineering_status->preengineering_images()->create([
                     'file' => $path,
@@ -118,6 +117,19 @@ class PreengineeringStatusController extends Controller
                     'user_id' => Auth::id(),
                 ]
             );
+        }
+
+        if ($request->hasFile('images.*.file')) {
+            foreach ($request->images as $imageData) {
+                $path = $imageData['file']->store('preengineering_images', 'public');
+
+                $preengineering->preengineering_images()->create([
+                    'file' => $path,
+                    'lat' => $imageData['lat'],
+                    'long' => $imageData['long'],
+                    'user_id' => Auth::id(),
+                ]);
+            }
         }
 
         return new PreengineeringStatusResource(
